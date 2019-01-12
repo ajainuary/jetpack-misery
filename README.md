@@ -1,11 +1,9 @@
-Graphics Boilerplate Code
+Jetpack Misery
 =========================
 
-This is boilerplate code for the assignments which might be helpful.
+Video game built for the graphics course at IIIT-H.
 
 
 License
 -------
-The MIT License https://meghprkh.mit-license.org/
-
-Copyright &copy; 2018 Megh Parikh <meghprkh@gmail.com>
+The MIT License https://meghprkh.mit-license.org/ for Boilerplate Code
