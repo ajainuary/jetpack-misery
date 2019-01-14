@@ -148,7 +148,7 @@ GLuint LoadShaders(const char *vertex_file_path, const char *fragment_file_path)
 }
 
 
-/* Generate VAO, VBOs and return VAO handle */
+/* Generate VAO, VBOs and return pointer VAO handle/wrapper */
 struct VAO *create3DObject(GLenum primitive_mode, int numVertices, const GLfloat *vertex_buffer_data, const GLfloat *color_buffer_data, GLenum fill_mode) {
     struct VAO *vao = new struct VAO;
     vao->PrimitiveMode = primitive_mode;
@@ -163,17 +163,17 @@ struct VAO *create3DObject(GLenum primitive_mode, int numVertices, const GLfloat
 
     glBindVertexArray (vao->VertexArrayID); // Bind the VAO
     glBindBuffer (GL_ARRAY_BUFFER, vao->VertexBuffer); // Bind the VBO vertices
-    glBufferData (GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), vertex_buffer_data, GL_STATIC_DRAW); // Copy the vertices into VBO
+    glBufferData (GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), vertex_buffer_data, GL_STATIC_DRAW); // Copy the vertices into VBO which was bound
     glVertexAttribPointer(
         0,                            // attribute 0. Vertices
         3,                            // size (x,y,z)
         GL_FLOAT,                     // type
         GL_FALSE,                     // normalized?
         0,                            // stride
-        (void *) 0                      // array buffer offset
+        (void *) nullptr                      // array buffer offset
     );
 
-    glBindBuffer (GL_ARRAY_BUFFER, vao->ColorBuffer); // Bind the VBO colors
+    glBindBuffer (GL_ARRAY_BUFFER, vao->ColorBuffer); // Bind the VBO colors (see we changed our buffer?)
     glBufferData (GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), color_buffer_data, GL_STATIC_DRAW); // Copy the vertex colors
     glVertexAttribPointer(
         1,                            // attribute 1. Color
@@ -181,7 +181,7 @@ struct VAO *create3DObject(GLenum primitive_mode, int numVertices, const GLfloat
         GL_FLOAT,                     // type
         GL_FALSE,                     // normalized?
         0,                            // stride
-        (void *) 0                    // array buffer offset
+        (void *) nullptr                    // array buffer offset
     );
 
     return vao;

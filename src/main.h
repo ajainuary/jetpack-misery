@@ -42,11 +42,11 @@ void reshapeWindow(GLFWwindow *window, int width, int height);
 
 // Types
 struct VAO {
-    GLuint VertexArrayID;
-    GLuint VertexBuffer;
-    GLuint ColorBuffer;
+    GLuint VertexArrayID; //Unique identifier
+    GLuint VertexBuffer; //Associated Vertex Buffer
+    GLuint ColorBuffer; //Associated Color Buffer
 
-    GLenum PrimitiveMode;
+    GLenum PrimitiveMode; //OpenGL Primitive used to render
     GLenum FillMode;
     int    NumVertices;
 };
