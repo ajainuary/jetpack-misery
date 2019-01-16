@@ -4,12 +4,12 @@
 #define BALL_H
 
 
-class Ball {
+class Object {
     /* This is the primary class for all movable objects
      * and sprites */
 public:
-    Ball() {}
-    Ball(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices);
+    Object() {}
+    Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices);
     glm::vec3 position;
     float rotation;
     void draw(glm::mat4 VP);
@@ -20,10 +20,10 @@ private:
     VAO *object;
 };
 
-class Player : public Ball {
+class Player : public Object {
 public:
     Player() {}
-    Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y, GLfloat vertex_buffer_data[], int num_vertices) : Ball(x,y,color, vertex_buffer_data, num_vertices)
+    Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y, GLfloat vertex_buffer_data[], int num_vertices) : Object(x,y,color, vertex_buffer_data, num_vertices)
         {
             std::cerr << sizeof(vertex_buffer_data) << ' ' << num_vertices << '\n';
             this->a = glm::vec3(a_x, a_y, 0);

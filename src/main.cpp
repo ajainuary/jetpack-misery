@@ -1,6 +1,6 @@
 #include "main.h"
 #include "timer.h"
-#include "ball.h"
+#include "object.h"
 
 using namespace std;
 
