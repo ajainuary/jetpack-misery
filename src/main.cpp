@@ -12,9 +12,8 @@ GLFWwindow *window;
 * Customizable functions *
 **************************/
 
-Ball ball1;
-
-float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
+Player p;
+float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
 
 Timer t60(1.0 / 60);
@@ -52,20 +51,20 @@ void draw() {
     glm::mat4 MVP;  // MVP = Projection * View * Model
 
     // Scene render
-    ball1.draw(VP);
+    p.draw(VP);
 }
 
 void tick_input(GLFWwindow *window) {
     int left  = glfwGetKey(window, GLFW_KEY_LEFT);
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
-    if (left) {
-        // Do something
+    int up = glfwGetKey(window, GLFW_KEY_UP);
+    if(up) {
+        p.v.y = 0.04f;
     }
 }
 
 void tick_elements() {
-    ball1.tick();
-    camera_rotation_angle += 1;
+    p.tick();
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -74,8 +73,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
 
-    ball1       = Ball(0, 0, COLOR_RED);
-
+    p = Player(2,2, COLOR_PINK, 0, -0.02f/60.0f, 0, 0);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
@@ -100,8 +98,8 @@ void initGL(GLFWwindow *window, int width, int height) {
 
 int main(int argc, char **argv) {
     srand(time(0));
-    int width  = 600;
-    int height = 600;
+    int width  = 1600;
+    int height = 900;
 
     window = initGLFW(width, height);
 
@@ -135,9 +133,9 @@ bool detect_collision(bounding_box_t a, bounding_box_t b) {
 }
 
 void reset_screen() {
-    float top    = screen_center_y + 4 / screen_zoom;
-    float bottom = screen_center_y - 4 / screen_zoom;
-    float left   = screen_center_x - 4 / screen_zoom;
-    float right  = screen_center_x + 4 / screen_zoom;
+    float top    = screen_center_y + 4.5f / screen_zoom;
+    float bottom = screen_center_y - 4.5f / screen_zoom;
+    float left   = screen_center_x - 8 / screen_zoom;
+    float right  = screen_center_x + 8 / screen_zoom;
     Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
 }

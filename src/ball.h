@@ -5,6 +5,8 @@
 
 
 class Ball {
+    /* This is the primary class for all movable objects
+     * and sprites */
 public:
     Ball() {}
     Ball(float x, float y, color_t color);
@@ -16,6 +18,19 @@ public:
     double speed;
 private:
     VAO *object;
+};
+
+class Player : public Ball {
+public:
+    Player() {}
+    Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y) : Ball(x,y,color)
+        {
+            this->a = glm::vec3(a_x, a_y, 0);
+            this->v = glm::vec3(v_x, v_y, 0);
+        }
+    glm::vec3 a; //Acceleration +ve downwards -ve upwards
+    glm::vec3 v; //Velocities in x & y directions
+    void tick();
 };
 
 #endif // BALL_H

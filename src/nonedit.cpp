@@ -163,7 +163,10 @@ struct VAO *create3DObject(GLenum primitive_mode, int numVertices, const GLfloat
 
     glBindVertexArray (vao->VertexArrayID); // Bind the VAO
     glBindBuffer (GL_ARRAY_BUFFER, vao->VertexBuffer); // Bind the VBO vertices
-    glBufferData (GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), vertex_buffer_data, GL_STATIC_DRAW); // Copy the vertices into VBO which was bound
+    /* We were using GL_STATIC_DRAW for buffering all types of data which is not very efficient,
+     * sometimes GL_DYNAMIC_DRAW would have been more efficient
+     */
+    glBufferData (GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), vertex_buffer_data, GL_DYNAMIC_DRAW); // Copy the vertices into VBO which was bound
     glVertexAttribPointer(
         0,                            // attribute 0. Vertices
         3,                            // size (x,y,z)

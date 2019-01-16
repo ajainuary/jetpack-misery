@@ -71,3 +71,22 @@ void Ball::tick() {
     // this->position.y -= speed;
 }
 
+void Player::tick() {
+    this->v.x = this->v.x+this->a.x;
+    this->v.y = this->v.y+this->a.y;
+    this->position.x = this->position.x+this->v.x;
+    this->position.y = this->position.y+this->v.y;
+    if(this->position.y < 0)
+    {
+        this->v.y = -0.64f*this->v.y;
+        this->a.y += -0.1f*this->position.y;
+    }
+    else if(this->position.y > 6)
+    {
+        this->v.y = -0.64f*this->v.y;
+        this->a.y += -0.1f*(this->position.y-6);
+    }
+    else {
+        this->a.y = -0.02/60.0f;
+    }
+}
