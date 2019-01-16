@@ -72,8 +72,45 @@ void tick_elements() {
 void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
-
-    p = Player(2,2, COLOR_PINK, 0, -0.02f/60.0f, 0, 0);
+    GLfloat vertex_buffer_data[] = {
+                -1.0f,-1.0f,-1.0f, // triangle 1 : begin
+                -1.0f,-1.0f, 1.0f,
+                -1.0f, 1.0f, 1.0f, // triangle 1 : end
+                1.0f, 1.0f,-1.0f, // triangle 2 : begin
+                -1.0f,-1.0f,-1.0f,
+                -1.0f, 1.0f,-1.0f, // triangle 2 : end
+                1.0f,-1.0f, 1.0f,
+                -1.0f,-1.0f,-1.0f,
+                1.0f,-1.0f,-1.0f,
+                1.0f, 1.0f,-1.0f,
+                1.0f,-1.0f,-1.0f,
+                -1.0f,-1.0f,-1.0f,
+                -1.0f,-1.0f,-1.0f,
+                -1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f,-1.0f,
+                1.0f,-1.0f, 1.0f,
+                -1.0f,-1.0f, 1.0f,
+                -1.0f,-1.0f,-1.0f,
+                -1.0f, 1.0f, 1.0f,
+                -1.0f,-1.0f, 1.0f,
+                1.0f,-1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f,-1.0f,-1.0f,
+                1.0f, 1.0f,-1.0f,
+                1.0f,-1.0f,-1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f,-1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f,-1.0f,
+                -1.0f, 1.0f,-1.0f,
+                1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f,-1.0f,
+                -1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f, 1.0f,
+                1.0f,-1.0f, 1.0f
+    };
+    p = Player(2,2, COLOR_PINK, 0, -0.02f/60.0f, 0, 0, vertex_buffer_data, 12*3);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform

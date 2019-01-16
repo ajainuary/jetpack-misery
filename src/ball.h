@@ -9,7 +9,7 @@ class Ball {
      * and sprites */
 public:
     Ball() {}
-    Ball(float x, float y, color_t color);
+    Ball(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices);
     glm::vec3 position;
     float rotation;
     void draw(glm::mat4 VP);
@@ -23,8 +23,9 @@ private:
 class Player : public Ball {
 public:
     Player() {}
-    Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y) : Ball(x,y,color)
+    Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y, GLfloat vertex_buffer_data[], int num_vertices) : Ball(x,y,color, vertex_buffer_data, num_vertices)
         {
+            std::cerr << sizeof(vertex_buffer_data) << ' ' << num_vertices << '\n';
             this->a = glm::vec3(a_x, a_y, 0);
             this->v = glm::vec3(v_x, v_y, 0);
         }
