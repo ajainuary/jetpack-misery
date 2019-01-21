@@ -13,9 +13,10 @@ GLFWwindow *window;
 **************************/
 
 Player p;
+Platform ground;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
-
+float position = 0.0f;
 Timer t60(1.0 / 60);
 
 /* Render the scene with openGL */
@@ -39,7 +40,7 @@ void draw() {
     // Compute Camera matrix (view)
     //  Matrices.view = glm::lookAt( eye, target, up ); // Rotating Camera for 3D
     // Don't change unless you are sure!!
-    Matrices.view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); // Fixed camera for 2D (ortho) in XY plane
+    Matrices.view = glm::lookAt(glm::vec3(position, 0, 3), glm::vec3(position, 0, 0), glm::vec3(0, 1, 0)); // Fixed camera for 2D (ortho) in XY plane
 
     // Compute ViewProject matrix as view/camera might not be changed for this frame (basic scenario)
     // Don't change unless you are sure!!
@@ -52,6 +53,7 @@ void draw() {
 
     // Scene render
     p.draw(VP);
+    ground.draw(VP);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -65,6 +67,8 @@ void tick_input(GLFWwindow *window) {
 
 void tick_elements() {
     p.tick();
+    position += 0.075f;
+    p.position.x += 0.075f;
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -72,7 +76,7 @@ void tick_elements() {
 void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
-    GLfloat vertex_buffer_data[] = {
+    GLfloat player_vertex_buffer_data[] = {
                 -1.0f,-1.0f,-1.0f, // triangle 1 : begin
                 -1.0f,-1.0f, 1.0f,
                 -1.0f, 1.0f, 1.0f, // triangle 1 : end
@@ -110,12 +114,21 @@ void initGL(GLFWwindow *window, int width, int height) {
                 -1.0f, 1.0f, 1.0f,
                 1.0f,-1.0f, 1.0f
     };
-    p = Player(2,2, COLOR_PINK, 0, -0.05f/60.0f, 0, 0, vertex_buffer_data, 12*3);
+    p = Player(2,2, COLOR_PINK, 0, -0.05f/60.0f, 0, 0, player_vertex_buffer_data, 12*3);
+    float width_platform = 5000.0f;
+    GLfloat platform_vertex_buffer_data [] = {
+        -width_platform,-1,0,
+        width_platform,-1,0,
+        -width_platform,-2,0,
+        width_platform,-1,0,
+        width_platform,-2,0,
+        -width_platform,-2,0
+};
+    ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
     Matrices.MatrixID = glGetUniformLocation(programID, "MVP");
-
 
     reshapeWindow (window, width, height);
 

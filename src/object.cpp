@@ -1,7 +1,7 @@
 #include "object.h"
 #include "main.h"
 
-Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices) {
+Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices, GLenum primitive_mode) {
     this->position = glm::vec3(x, y, 0);
     this->rotation = 0;
     speed = 1;
@@ -33,13 +33,11 @@ void Object::tick() {
 }
 
 void Player::tick() {
-    std::cerr << this->position.y << '\n';
     //Standard physics
     this->v.x = this->v.x+this->a.x;
     this->v.y = this->v.y+this->a.y;
     this->position.x = this->position.x+this->v.x;
     this->position.y = max(this->position.y+this->v.y, 0); //prevent sinking into ground
-    std::cerr << this->position.y << '\n';
     //Jetpack physics
     if(this->joy)
     {

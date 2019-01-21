@@ -9,7 +9,7 @@ class Object {
      * and sprites */
 public:
     Object() {}
-    Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices);
+    Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices, GLenum primitive_mode = GL_TRIANGLES);
     glm::vec3 position;
     float rotation;
     void draw(glm::mat4 VP);
@@ -34,6 +34,12 @@ public:
     glm::vec3 v; //Velocities in x & y directions
     bool joy; //Press the jetpack?
     void tick();
+};
+
+class Platform : public Object {
+public:
+    Platform() {}
+    Platform(color_t color, GLfloat vertex_buffer_data[]) : Object(0.0f, 0.0f, color, vertex_buffer_data, 6){};
 };
 
 #endif // BALL_H
