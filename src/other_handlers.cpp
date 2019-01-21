@@ -50,3 +50,13 @@ void reshapeWindow(GLFWwindow *window, int width, int height) {
     // Ortho projection for 2D views
     reset_screen();
 }
+
+float max(float x, float y) {
+    if(y < x) return x;
+    return y;
+}
+
+float min(float x, float y) {
+    if(x < y) return x;
+    return y;
+}

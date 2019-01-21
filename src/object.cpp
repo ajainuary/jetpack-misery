@@ -33,21 +33,18 @@ void Object::tick() {
 }
 
 void Player::tick() {
+    std::cerr << this->position.y << '\n';
+    //Standard physics
     this->v.x = this->v.x+this->a.x;
     this->v.y = this->v.y+this->a.y;
     this->position.x = this->position.x+this->v.x;
-    this->position.y = this->position.y+this->v.y;
-    if(this->position.y < 0)
+    this->position.y = max(this->position.y+this->v.y, 0); //prevent sinking into ground
+    std::cerr << this->position.y << '\n';
+    //Jetpack physics
+    if(this->joy)
     {
-        this->v.y = -0.64f*this->v.y;
-        this->a.y += -0.1f*this->position.y;
-    }
-    else if(this->position.y > 6)
-    {
-        this->v.y = -0.64f*this->v.y;
-        this->a.y += -0.1f*(this->position.y-6);
-    }
-    else {
-        this->a.y = -0.02/60.0f;
+        this->position.y = min(6, this->position.y+0.05f); //prevent going to space
+        this->v.y = 0;
+        this->joy = false;
     }
 }

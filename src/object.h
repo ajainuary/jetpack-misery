@@ -28,9 +28,11 @@ public:
             std::cerr << sizeof(vertex_buffer_data) << ' ' << num_vertices << '\n';
             this->a = glm::vec3(a_x, a_y, 0);
             this->v = glm::vec3(v_x, v_y, 0);
+            this->joy = false;
         }
     glm::vec3 a; //Acceleration +ve downwards -ve upwards
     glm::vec3 v; //Velocities in x & y directions
+    bool joy; //Press the jetpack?
     void tick();
 };
 

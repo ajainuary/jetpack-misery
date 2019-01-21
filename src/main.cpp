@@ -59,7 +59,7 @@ void tick_input(GLFWwindow *window) {
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
     if(up) {
-        p.v.y = 0.04f;
+        p.joy = true;
     }
 }
 
@@ -110,7 +110,7 @@ void initGL(GLFWwindow *window, int width, int height) {
                 -1.0f, 1.0f, 1.0f,
                 1.0f,-1.0f, 1.0f
     };
-    p = Player(2,2, COLOR_PINK, 0, -0.02f/60.0f, 0, 0, vertex_buffer_data, 12*3);
+    p = Player(2,2, COLOR_PINK, 0, -0.05f/60.0f, 0, 0, vertex_buffer_data, 12*3);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
