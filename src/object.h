@@ -42,4 +42,15 @@ public:
     Platform(color_t color, GLfloat vertex_buffer_data[]) : Object(0.0f, 0.0f, color, vertex_buffer_data, 6){};
 };
 
+class Coin : public Object {
+public:
+    Coin() {}
+    Coin(float x, float y, int value, color_t color, GLfloat vertex_buffer_data[], int number_vertices) : Object(x, y, color, vertex_buffer_data, number_vertices, GL_TRIANGLE_FAN){
+        this->value = value;
+        this->visible = true;
+    }
+    int value;
+    bool visible;
+};
+
 #endif // BALL_H

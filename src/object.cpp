@@ -7,7 +7,7 @@ Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], in
     speed = 1;
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    this->object = create3DObject(GL_TRIANGLES, num_vertices, vertex_buffer_data, color, GL_FILL);
+    this->object = create3DObject(primitive_mode, num_vertices, vertex_buffer_data, color, GL_FILL);
 }
 
 void Object::draw(glm::mat4 VP) {

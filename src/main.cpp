@@ -14,6 +14,7 @@ GLFWwindow *window;
 
 Player p;
 Platform ground;
+Coin paisa;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
 float position = 0.0f;
@@ -54,6 +55,7 @@ void draw() {
     // Scene render
     p.draw(VP);
     ground.draw(VP);
+    paisa.draw(VP);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -67,8 +69,8 @@ void tick_input(GLFWwindow *window) {
 
 void tick_elements() {
     p.tick();
-    position += 0.075f;
-    p.position.x += 0.075f;
+//    position += 0.075f;
+//    p.position.x += 0.075f;
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -125,6 +127,15 @@ void initGL(GLFWwindow *window, int width, int height) {
         -width_platform,-2,0
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
+    GLfloat coin_vertex_buffer_data[362*3];
+    coin_vertex_buffer_data[0] = 0.0f; coin_vertex_buffer_data[1] = 0.0f; coin_vertex_buffer_data[2] = 0.0f;
+    for(int i = 0; i < 361; ++i) {
+        coin_vertex_buffer_data[3*i] = cos(M_PI*(float(i)/180.0f));
+        coin_vertex_buffer_data[3*i+1] = sin(M_PI*(float(i)/180.0f));
+        coin_vertex_buffer_data[3*i+2] = 0;
+//        cerr << coin_vertex_buffer_data[3*i] << ' ' << coin_vertex_buffer_data[3*i+1] << ' ' << coin_vertex_buffer_data[3*i+2] << endl;
+    }
+    paisa = Coin(2,3, 5, COLOR_SECONDARY_PINK, coin_vertex_buffer_data, 362);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
