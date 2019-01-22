@@ -69,15 +69,8 @@ void tick_input(GLFWwindow *window) {
 
 void tick_elements() {
     p.tick();
-    for(auto it = coins.begin(); it != coins.end(); ++it)
-    {
-        if(detect_collision(it->box, p.box))
-        {
-            cerr << "detect collision" << endl;
-            cerr << it->box.width << ' ' << it->box.height << endl;
-            it = coins.erase(it);
-            if(it == coins.end()) break;
-        }
+    for (auto it = find_collision(coins.begin(), coins.end(), p); it != coins.end();it = find_collision(it, coins.end(), p)) {
+        it = coins.erase(it);
     }
 //    cerr << "out of loop" << endl;
 //    position += 0.075f;
