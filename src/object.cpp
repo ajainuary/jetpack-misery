@@ -49,7 +49,7 @@ void Player::tick() {
     //Jetpack physics
     if(this->joy)
     {
-        y = min(6, y+0.05f); //prevent going to space
+        y = min(6, y+0.075f); //prevent going to space
         this->v.y = 0;
         this->joy = false;
     }

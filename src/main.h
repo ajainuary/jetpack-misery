@@ -87,6 +87,7 @@ extern const color_t COLOR_BACKGROUND;
 extern const color_t COLOR_PINK;
 extern const color_t COLOR_SECONDARY_PINK;
 extern const color_t COLOR_YELLOW;
+extern const color_t COLOR_FAWN;
 // ---- Helpers ----
 extern float min(float x, float y);
 extern float max(float x, float y);
