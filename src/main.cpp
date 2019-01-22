@@ -1,7 +1,7 @@
 #include "main.h"
 #include "timer.h"
 #include "object.h"
-
+#include "handlers.hpp"
 using namespace std;
 
 GLMatrices Matrices;
@@ -14,7 +14,7 @@ GLFWwindow *window;
 
 Player p;
 Platform ground;
-Coin paisa;
+deque <Coin> coins;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
 float position = 0.0f;
@@ -55,7 +55,7 @@ void draw() {
     // Scene render
     p.draw(VP);
     ground.draw(VP);
-    paisa.draw(VP);
+    draw_collection(coins.begin(), coins.end(), VP);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -69,6 +69,17 @@ void tick_input(GLFWwindow *window) {
 
 void tick_elements() {
     p.tick();
+    for(auto it = coins.begin(); it != coins.end(); ++it)
+    {
+        if(detect_collision(it->box, p.box))
+        {
+            cerr << "detect collision" << endl;
+            cerr << it->box.width << ' ' << it->box.height << endl;
+            it = coins.erase(it);
+            if(it == coins.end()) break;
+        }
+    }
+//    cerr << "out of loop" << endl;
 //    position += 0.075f;
 //    p.position.x += 0.075f;
 }
@@ -128,14 +139,9 @@ void initGL(GLFWwindow *window, int width, int height) {
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     GLfloat coin_vertex_buffer_data[362*3];
-    coin_vertex_buffer_data[0] = 0.0f; coin_vertex_buffer_data[1] = 0.0f; coin_vertex_buffer_data[2] = 0.0f;
-    for(int i = 0; i < 361; ++i) {
-        coin_vertex_buffer_data[3*i] = cos(M_PI*(float(i)/180.0f));
-        coin_vertex_buffer_data[3*i+1] = sin(M_PI*(float(i)/180.0f));
-        coin_vertex_buffer_data[3*i+2] = 0;
-//        cerr << coin_vertex_buffer_data[3*i] << ' ' << coin_vertex_buffer_data[3*i+1] << ' ' << coin_vertex_buffer_data[3*i+2] << endl;
-    }
-    paisa = Coin(2,3, 5, COLOR_SECONDARY_PINK, coin_vertex_buffer_data, 362);
+    create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
+    coins.push_back(Coin(2,5, 5, COLOR_YELLOW, coin_vertex_buffer_data, 362));
+    coins.push_back(Coin(2,6, 5, COLOR_YELLOW, coin_vertex_buffer_data, 362));
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform

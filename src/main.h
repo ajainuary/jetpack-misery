@@ -5,6 +5,8 @@
 #include <cmath>
 #include <fstream>
 #include <vector>
+#include <queue>
+#include <algorithm>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -84,7 +86,10 @@ extern const color_t COLOR_BLACK;
 extern const color_t COLOR_BACKGROUND;
 extern const color_t COLOR_PINK;
 extern const color_t COLOR_SECONDARY_PINK;
+extern const color_t COLOR_YELLOW;
 // ---- Helpers ----
 extern float min(float x, float y);
 extern float max(float x, float y);
+// ---- Shape Creators ----
+extern void create_ellipse(float a, float b, GLfloat vertex_buffer_data[]);
 #endif

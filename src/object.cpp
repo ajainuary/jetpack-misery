@@ -4,9 +4,14 @@
 Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], int num_vertices, GLenum primitive_mode) {
     this->position = glm::vec3(x, y, 0);
     this->rotation = 0;
-    speed = 1;
-    // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
+    GLfloat max_y = INT_MIN, max_x = INT_MIN, min_y = INT_MAX, min_x = INT_MAX;
+    for (int i = 0;i < num_vertices; ++i) {
+        max_x = max(max_x, vertex_buffer_data[3*i]);
+        min_x = min(min_x, vertex_buffer_data[3*i]);
+        max_y = max(max_y, vertex_buffer_data[3*i+1]);
+        min_y = min(min_y, vertex_buffer_data[3*i+1]);
+    }
+    this->box = {x, y, max_x-min_x, max_y-min_y};
     this->object = create3DObject(primitive_mode, num_vertices, vertex_buffer_data, color, GL_FILL);
 }
 
@@ -24,6 +29,8 @@ void Object::draw(glm::mat4 VP) {
 
 void Object::set_position(float x, float y) {
     this->position = glm::vec3(x, y, 0);
+    this->box.x = x;
+    this->box.y = y;
 }
 
 void Object::tick() {
@@ -34,15 +41,17 @@ void Object::tick() {
 
 void Player::tick() {
     //Standard physics
+    float x = this->position.x, y = this->position.y;
     this->v.x = this->v.x+this->a.x;
     this->v.y = this->v.y+this->a.y;
-    this->position.x = this->position.x+this->v.x;
-    this->position.y = max(this->position.y+this->v.y, 0); //prevent sinking into ground
+    x = x+this->v.x;
+    y = max(y+this->v.y, 0); //prevent sinking into ground
     //Jetpack physics
     if(this->joy)
     {
-        this->position.y = min(6, this->position.y+0.05f); //prevent going to space
+        y = min(6, y+0.05f); //prevent going to space
         this->v.y = 0;
         this->joy = false;
     }
+    this->set_position(x, y);
 }

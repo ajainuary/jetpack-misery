@@ -60,3 +60,13 @@ float min(float x, float y) {
     if(x < y) return x;
     return y;
 }
+
+void create_ellipse(float a, float b, GLfloat vertex_buffer_data[]) {
+    /* The standard ellipse contains 361 points on it's boundary and 1 at the origin */
+    vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
+    for(int i = 0; i < 361; ++i) {
+        vertex_buffer_data[3*i+3] = a*cos(M_PI*(float(i)/180.0f));
+        vertex_buffer_data[3*i+4] = b*sin(M_PI*(float(i)/180.0f));
+        vertex_buffer_data[3*i+5] = 0;
+    }
+}
