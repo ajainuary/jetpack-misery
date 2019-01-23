@@ -88,6 +88,24 @@ public:
             };
             this->objects.push_back({Object(0, 0, COLOR_YELLOW, rectangle, 6), {0, 0, 0}});
         }
+        else if(angle = 2) {
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.175, 0.175, circle_vertex);
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,1,0}});
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,-1,0}});
+            std::cerr << this->objects.size() << std::endl;
+            GLfloat rectangle[] = {
+                0.175, -1, 0,
+                0.175, 1, 0,
+                -0.175, -1, 0,
+                0.175, 1, 0,
+                -0.175, 1, 0,
+                -0.175, -1, 0
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, rectangle, 6), {0, 0, 0}});
+        }
     }
 };
 

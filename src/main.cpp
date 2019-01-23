@@ -150,7 +150,7 @@ void initGL(GLFWwindow *window, int width, int height) {
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
-    test = FireLine(3, 4);
+    test = FireLine(5, 4, 2);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
