@@ -12,6 +12,14 @@ Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], in
         min_y = min(min_y, vertex_buffer_data[3*i+1]);
     }
     this->box = {x, y, max_x-min_x, max_y-min_y};
+    this->num_vertices = num_vertices;
+    if(primitive_mode == GL_TRIANGLES) {
+        this->advanced_collision_detection = true;
+        this->mesh = std::vector<GLfloat>(vertex_buffer_data, vertex_buffer_data+(num_vertices*3));
+    }
+    else {
+        this->advanced_collision_detection = false;
+    }
     this->object = create3DObject(primitive_mode, num_vertices, vertex_buffer_data, color, GL_FILL);
 }
 
@@ -62,7 +70,7 @@ void Combo::set_position(float x, float y) {
     this->y = y;
     for(auto &o : this->objects) {
         o.first.set_position(x+o.second.x, y+o.second.y);
-        std::cerr << o.first.position.x << ' ' << o.first.position.y << ' ' << x+o.second.x << ' ' << y+o.second.y << std::endl;
+//        std::cerr << o.first.position.x << ' ' << o.first.position.y << ' ' << x+o.second.x << ' ' << y+o.second.y << std::endl;
     }
     return;
 }

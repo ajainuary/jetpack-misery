@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "object.h"
 #include "handlers.hpp"
+
 using namespace std;
 
 GLMatrices Matrices;
@@ -16,7 +17,7 @@ Player p;
 Platform ground;
 deque <Coin> coins;
 FireLine test;
-
+Combo ok;
 GLfloat coin_vertex_buffer_data[362*3];
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
@@ -57,10 +58,10 @@ void draw() {
 
     // Scene render
     test.draw(VP);
-    p.draw(VP);
+    ok.draw(VP);
+//    p.draw(VP);
     ground.draw(VP);
     draw_collection(coins.begin(), coins.end(), VP);
-
 }
 
 void game_over(Player &p) {
@@ -72,8 +73,19 @@ void tick_input(GLFWwindow *window) {
     int left  = glfwGetKey(window, GLFW_KEY_LEFT);
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
+    int down = glfwGetKey(window, GLFW_KEY_DOWN);
     if(up) {
-        p.joy = true;
+//        p.joy = true;
+        ok.set_position(ok.x, ok.y+0.01f);
+    }
+    if(right) {
+        ok.set_position(ok.x+0.01f, ok.y);
+    }
+    if(left) {
+        ok.set_position(ok.x-0.01f, ok.y);
+    }
+    if(down) {
+        ok.set_position(ok.x, ok.y-0.01f);
     }
 }
 
@@ -85,8 +97,10 @@ void tick_elements() {
         it = coins.erase(it);
     }
     //Combo test
-    if(test.detect(p.box))
+    if(collides(ok, test))
         game_over(p);
+//    if(test.detect(p.box))
+//        game_over(p);
     //Coin Spawning
 //    int coin_rand = rand();
 //    if(coin_rand < RAND_MAX/50)
@@ -138,7 +152,9 @@ void initGL(GLFWwindow *window, int width, int height) {
                 -1.0f, 1.0f, 1.0f,
                 1.0f,-1.0f, 1.0f
     };
-    p = Player(2,2, COLOR_PINK, 0, -0.075f/60.0f, 0, 0, player_vertex_buffer_data, 12*3);
+//    p = Player(2,2, COLOR_PINK, 0, -0.075f/60.0f, 0, 0, player_vertex_buffer_data, 12*3);
+    ok = Combo(2, 2);
+    ok.objects.push_back({Object(0, 0, COLOR_PINK, player_vertex_buffer_data, 12*3), {0, 0, 0}});
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
         -width_platform,-1,0,
@@ -150,7 +166,7 @@ void initGL(GLFWwindow *window, int width, int height) {
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
-    test = FireLine(5, 4, 1);
+    test = FireLine(3, 4, 1);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
