@@ -88,9 +88,12 @@ extern const color_t COLOR_PINK;
 extern const color_t COLOR_SECONDARY_PINK;
 extern const color_t COLOR_YELLOW;
 extern const color_t COLOR_FAWN;
+extern const color_t COLOR_GREY;
 // ---- Helpers ----
 extern float min(float x, float y);
 extern float max(float x, float y);
+extern bool detect_collision(bounding_box_t a, bounding_box_t b);
+extern void add_shapes(GLfloat first[], int first_size, GLfloat second[], int second_size, GLfloat answer[], float x, float y); //Primitive Mode: GL_TRIANGLES only
 // ---- Shape Creators ----
-extern void create_ellipse(float a, float b, GLfloat vertex_buffer_data[]);
+extern void create_ellipse(float a, float b, GLfloat vertex_buffer_data[], float origin_x = 0, float origin_y = 0);
 #endif

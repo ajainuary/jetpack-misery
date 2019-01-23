@@ -61,12 +61,30 @@ float min(float x, float y) {
     return y;
 }
 
-void create_ellipse(float a, float b, GLfloat vertex_buffer_data[]) {
+void create_ellipse(float a, float b, GLfloat vertex_buffer_data[], float origin_x, float origin_y) {
     /* The standard ellipse contains 361 points on it's boundary and 1 at the origin */
-    vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
+    vertex_buffer_data[0] = origin_x; vertex_buffer_data[1] = origin_y; vertex_buffer_data[2] = 0.0f;
     for(int i = 0; i < 361; ++i) {
-        vertex_buffer_data[3*i+3] = a*cos(M_PI*(float(i)/180.0f));
-        vertex_buffer_data[3*i+4] = b*sin(M_PI*(float(i)/180.0f));
+        vertex_buffer_data[3*i+3] = origin_x + a*cos(M_PI*(float(i)/180.0f));
+        vertex_buffer_data[3*i+4] = origin_y + b*sin(M_PI*(float(i)/180.0f));
         vertex_buffer_data[3*i+5] = 0;
     }
+}
+
+void add_shapes(GLfloat first[], int first_size, GLfloat second[], int second_size, GLfloat answer[], float x, float y) {
+    int i = 0;
+    for(; i < 3*first_size; ++i)
+        answer[i] = first[i];
+    for(int j = 0; j < second_size; ++j)
+    {
+        answer[i+3*j] = second[3*j]+x;
+        answer[i+3*j+1] = second[3*j+1]+y;
+        answer[i+3*j+2] = second[3*j+2];
+    }
+    return;
+}
+
+bool detect_collision(bounding_box_t a, bounding_box_t b) {
+    return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
+           (abs(a.y - b.y) * 2 < (a.height + b.height));
 }

@@ -15,7 +15,6 @@ public:
     void draw(glm::mat4 VP);
     void set_position(float x, float y);
     void tick();
-    double speed;
     bounding_box_t box;
 private:
     VAO *object;
@@ -48,10 +47,48 @@ public:
     Coin() {}
     Coin(float x, float y, int value, color_t color, GLfloat vertex_buffer_data[], int number_vertices) : Object(x, y, color, vertex_buffer_data, number_vertices, GL_TRIANGLE_FAN){
         this->value = value;
-        this->visible = true;
     }
     int value;
-    bool visible;
+};
+
+class Combo {
+    /* Combines objects to form one sprite */
+public:
+    Combo() {}
+    Combo(float x, float y) {
+        this->set_position(x, y);
+    }
+    std::vector<std::pair<Object, glm::vec3>> objects; //Objects along with their relative position from the combined origin
+    float x,y; //Origin
+    float rotation;
+    void set_position(float x, float y);
+    void draw(glm::mat4 VP);
+    bool detect(bounding_box_t p);
+};
+
+class FireLine : public Combo {
+public:
+    FireLine() {};
+    FireLine(float x, float y, int angle = 0) : Combo(x, y) {
+        if(angle == 0) {
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.175, 0.175, circle_vertex);
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {1,0,0}});
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-1,0,0}});
+            std::cerr << this->objects.size() << std::endl;
+            GLfloat rectangle[] = {
+                -1, 0.175, 0,
+                1, 0.175, 0,
+                -1, -0.175, 0,
+                1, 0.175, 0,
+                1, -0.175, 0,
+                -1, -0.175, 0,
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, rectangle, 6), {0, 0, 0}});
+        }
+    }
 };
 
 #endif // BALL_H

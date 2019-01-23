@@ -15,6 +15,8 @@ GLFWwindow *window;
 Player p;
 Platform ground;
 deque <Coin> coins;
+FireLine test;
+
 GLfloat coin_vertex_buffer_data[362*3];
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
@@ -54,9 +56,16 @@ void draw() {
     glm::mat4 MVP;  // MVP = Projection * View * Model
 
     // Scene render
+    test.draw(VP);
     p.draw(VP);
     ground.draw(VP);
     draw_collection(coins.begin(), coins.end(), VP);
+
+}
+
+void game_over(Player &p) {
+   cout << "Game Over" << endl;
+   exit(0);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -75,12 +84,15 @@ void tick_elements() {
         score += it->value;
         it = coins.erase(it);
     }
+    //Combo test
+    if(test.detect(p.box))
+        game_over(p);
     //Coin Spawning
-    int coin_rand = rand();
-    if(coin_rand < RAND_MAX/50)
-        coins.push_back(Coin(position + 20, coin_rand%8, (coin_rand%2 == 0) ? 1 : 2, (coin_rand % 2 == 0) ? COLOR_FAWN : COLOR_YELLOW, coin_vertex_buffer_data, 362));
-    position += 0.075f;
-    p.position.x += 0.075f;
+//    int coin_rand = rand();
+//    if(coin_rand < RAND_MAX/50)
+//        coins.push_back(Coin(position + 20, coin_rand%8, (coin_rand%2 == 0) ? 1 : 2, (coin_rand % 2 == 0) ? COLOR_FAWN : COLOR_YELLOW, coin_vertex_buffer_data, 362));
+//    position += 0.075f;
+//    p.position.x += 0.075f;
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -138,6 +150,7 @@ void initGL(GLFWwindow *window, int width, int height) {
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
+    test = FireLine(3, 4);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
@@ -188,11 +201,6 @@ int main(int argc, char **argv) {
     }
 
     quit(window);
-}
-
-bool detect_collision(bounding_box_t a, bounding_box_t b) {
-    return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
-           (abs(a.y - b.y) * 2 < (a.height + b.height));
 }
 
 void reset_screen() {

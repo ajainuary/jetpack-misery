@@ -16,6 +16,7 @@ Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], in
 }
 
 void Object::draw(glm::mat4 VP) {
+//    std::cerr << "Draw at " << this->position.x << ' ' << this->position.y << std::endl;
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
     glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
@@ -54,4 +55,32 @@ void Player::tick() {
         this->joy = false;
     }
     this->set_position(x, y);
+}
+
+void Combo::set_position(float x, float y) {
+    this->x = x;
+    this->y = y;
+    for(auto &o : this->objects) {
+        o.first.set_position(x+o.second.x, y+o.second.y);
+        std::cerr << o.first.position.x << ' ' << o.first.position.y << ' ' << x+o.second.x << ' ' << y+o.second.y << std::endl;
+    }
+    return;
+}
+
+void Combo::draw(glm::mat4 VP) {
+//    std::cerr << this->objects.size() << std::endl;
+    for(auto &o : this->objects) {
+        o.first.set_position(x+o.second.x, y+o.second.y);
+    }
+    for(auto &o : this->objects) {
+        o.first.draw(VP);
+    }
+}
+
+bool Combo::detect(bounding_box_t b) {
+    for(auto &o : this->objects) {
+        if(detect_collision(o.first.box, b))
+            return true;
+    }
+    return false;
 }
