@@ -89,6 +89,8 @@ extern const color_t COLOR_SECONDARY_PINK;
 extern const color_t COLOR_YELLOW;
 extern const color_t COLOR_FAWN;
 extern const color_t COLOR_GREY;
+extern const color_t COLOR_WOOD;
+extern const color_t COLOR_SECONDARY_WOOD;
 // ---- Helpers ----
 extern float min(float x, float y);
 extern float max(float x, float y);

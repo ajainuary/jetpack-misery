@@ -64,7 +64,7 @@ public:
     std::vector<std::pair<Object, glm::vec3>> objects; //Objects along with their relative position from the combined origin
     float x,y; //Origin
     float rotation;
-    void set_position(float x, float y);
+    void set_position(float x, float y, float rotation = 0);
     void draw(glm::mat4 VP);
     bool detect(bounding_box_t p);
 };
@@ -182,6 +182,34 @@ public:
             this->objects.push_back({Object(0, 0, COLOR_RED, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
         }
     }
+};
+
+class Boomerang : public Combo {
+public:
+    Boomerang() {}
+    Boomerang(float x, float y, float origin_x, float origin_y, float a, float b): Combo(x, y) {
+        GLfloat left_wing[] = {
+            0.25,0.25,0,
+            0+0.25,-0.175+0.25,0,
+            0, 0, 0
+        };
+        GLfloat right_wing[] = {
+            0.25,0.25,0,
+            0+0.25,-0.175+0.25,0,
+            0.5, 0, 0
+        };
+        this->objects.push_back({Object(0, 0, COLOR_WOOD, left_wing, 3), {0,0,0}});
+        this->objects.push_back({Object(0, 0, COLOR_SECONDARY_WOOD, right_wing, 3), {0,0,0}});
+        this->origin_x = origin_x;
+        this->origin_y = origin_y;
+        this->t = 0;
+        this->a = a;
+        this->b = b;
+    };
+    float origin_x, origin_y; //Origin of trajectory
+    float a, b; //Trajectory parameters
+    float t; //Parameter
+    void tick();
 };
 
 #endif // BALL_H
