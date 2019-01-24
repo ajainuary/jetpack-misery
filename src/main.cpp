@@ -21,6 +21,7 @@ Combo ok;
 Boomerang taki;
 deque <Water> fountain;
 GLfloat coin_vertex_buffer_data[362*3];
+Display text, text2;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
 float position = 0.0f;
@@ -64,6 +65,8 @@ void draw() {
 //    p.draw(VP);
     ground.draw(VP);
     taki.draw(VP);
+//    text.draw(VP);
+//    text2.draw(VP);
     draw_collection(coins.begin(), coins.end(), VP);
     draw_collection(fountain.begin(), fountain.end(), VP);
 }
@@ -211,6 +214,8 @@ void initGL(GLFWwindow *window, int width, int height) {
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
     test = FireLine(3, 4, 1);
     taki = Boomerang(6,4, 4,4, 2,1);
+    text = Display(6, 5, '0');
+    text2 = Display(6.8, 5, '0');
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
