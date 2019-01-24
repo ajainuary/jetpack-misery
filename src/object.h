@@ -28,14 +28,15 @@ public:
     Player() {}
     Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y, GLfloat vertex_buffer_data[], int num_vertices) : Object(x,y,color, vertex_buffer_data, num_vertices)
         {
-            std::cerr << sizeof(vertex_buffer_data) << ' ' << num_vertices << '\n';
             this->a = glm::vec3(a_x, a_y, 0);
             this->v = glm::vec3(v_x, v_y, 0);
             this->joy = false;
+            this->lives = 1;
         }
     glm::vec3 a; //Acceleration +ve downwards -ve upwards
     glm::vec3 v; //Velocities in x & y directions
     bool joy; //Press the jetpack?
+    int lives;
     void tick();
 };
 
@@ -225,6 +226,38 @@ public:
     float v_x,v_y,a_x,a_y; //Parameter
     int t;
     bool tick();
+};
+
+class Magnet : public Combo {
+public:
+    Magnet() {}
+    Magnet(float x, float y, float rotation) : Combo(x, y){
+        GLfloat vertex_buffer_data[182*3];
+        vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
+        for(int i = 0; i < 181; ++i) {
+            vertex_buffer_data[3*i+3] = 0.5*cos(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+4] = 0.5*sin(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_RED, vertex_buffer_data, 182, GL_TRIANGLE_FAN), {0, 0, 0}});
+        vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
+        for(int i = 0; i < 181; ++i) {
+            vertex_buffer_data[3*i+3] = 0.3*cos(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+4] = 0.3*sin(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_BACKGROUND, vertex_buffer_data, 182, GL_TRIANGLE_FAN), {0, 0, 0}});
+        GLfloat box[] = {
+            0,0,0,
+            0.2, 0, 0,
+            0, 0.2, 0,
+            0.2, 0, 0,
+            0.2, 0.2, 0.2,
+            0, 0.2, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_GREY, box, 6), {0.3, -0.2, 0}});
+        this->objects.push_back({Object(0, 0, COLOR_GREY, box, 6), {-0.5, -0.2, 0}});
+    }
 };
 
 class Display : public Combo {

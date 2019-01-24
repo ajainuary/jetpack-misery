@@ -18,7 +18,7 @@ Platform ground;
 deque <Coin> coins;
 FireLine test;
 Combo ok;
-Boomerang taki;
+Magnet taki;
 deque <Water> fountain;
 GLfloat coin_vertex_buffer_data[362*3];
 Display text, text2;
@@ -142,7 +142,7 @@ void tick_elements() {
     for (auto it = fountain.begin(); it != fountain.end(); (it->tick()) ? it = fountain.erase(it) : ++it);
     //Combo test
     if(collides(ok, test))
-        game_over(p);
+        --p.lives;
 //    if(test.detect(p.box))
 //        game_over(p);
     //Coin Spawning
@@ -152,7 +152,7 @@ void tick_elements() {
 //    position += 0.075f;
 //    p.position.x += 0.075f;
     //Boomerang test
-    taki.tick();
+//    taki.tick();
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -213,7 +213,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
     test = FireLine(3, 4, 1);
-    taki = Boomerang(6,4, 4,4, 2,1);
+    taki = Magnet(6,4, 0);
     text = Display(6, 5, '0');
     text2 = Display(6.8, 5, '0');
     // Create and compile our GLSL program from the shaders
