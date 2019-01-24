@@ -12,10 +12,19 @@ Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], in
         min_y = min(min_y, vertex_buffer_data[3*i+1]);
     }
     this->box = {x, y, max_x-min_x, max_y-min_y};
+    this->num_vertices = num_vertices;
+    if(primitive_mode == GL_TRIANGLES) {
+        this->advanced_collision_detection = true;
+        this->mesh = std::vector<GLfloat>(vertex_buffer_data, vertex_buffer_data+(num_vertices*3));
+    }
+    else {
+        this->advanced_collision_detection = false;
+    }
     this->object = create3DObject(primitive_mode, num_vertices, vertex_buffer_data, color, GL_FILL);
 }
 
 void Object::draw(glm::mat4 VP) {
+//    std::cerr << "Draw at " << this->position.x << ' ' << this->position.y << std::endl;
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
     glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
@@ -49,9 +58,37 @@ void Player::tick() {
     //Jetpack physics
     if(this->joy)
     {
-        y = min(6, y+0.05f); //prevent going to space
+        y = min(6, y+0.075f); //prevent going to space
         this->v.y = 0;
         this->joy = false;
     }
     this->set_position(x, y);
+}
+
+void Combo::set_position(float x, float y) {
+    this->x = x;
+    this->y = y;
+    for(auto &o : this->objects) {
+        o.first.set_position(x+o.second.x, y+o.second.y);
+//        std::cerr << o.first.position.x << ' ' << o.first.position.y << ' ' << x+o.second.x << ' ' << y+o.second.y << std::endl;
+    }
+    return;
+}
+
+void Combo::draw(glm::mat4 VP) {
+//    std::cerr << this->objects.size() << std::endl;
+    for(auto &o : this->objects) {
+        o.first.set_position(x+o.second.x, y+o.second.y);
+    }
+    for(auto &o : this->objects) {
+        o.first.draw(VP);
+    }
+}
+
+bool Combo::detect(bounding_box_t b) {
+    for(auto &o : this->objects) {
+        if(detect_collision(o.first.box, b))
+            return true;
+    }
+    return false;
 }

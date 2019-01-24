@@ -15,8 +15,10 @@ public:
     void draw(glm::mat4 VP);
     void set_position(float x, float y);
     void tick();
-    double speed;
+    std::vector<GLfloat> mesh;
+    int num_vertices;
     bounding_box_t box;
+    bool advanced_collision_detection;
 private:
     VAO *object;
 };
@@ -48,10 +50,138 @@ public:
     Coin() {}
     Coin(float x, float y, int value, color_t color, GLfloat vertex_buffer_data[], int number_vertices) : Object(x, y, color, vertex_buffer_data, number_vertices, GL_TRIANGLE_FAN){
         this->value = value;
-        this->visible = true;
     }
     int value;
-    bool visible;
+};
+
+class Combo {
+    /* Combines objects to form one sprite */
+public:
+    Combo() {}
+    Combo(float x, float y) {
+        this->set_position(x, y);
+    }
+    std::vector<std::pair<Object, glm::vec3>> objects; //Objects along with their relative position from the combined origin
+    float x,y; //Origin
+    float rotation;
+    void set_position(float x, float y);
+    void draw(glm::mat4 VP);
+    bool detect(bounding_box_t p);
+};
+
+class FireLine : public Combo {
+public:
+    FireLine() {};
+    FireLine(float x, float y, int angle = 0) : Combo(x, y) {
+        if(angle == 0) {
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.175, 0.175, circle_vertex);
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {1,0,0}});
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-1,0,0}});
+            std::cerr << this->objects.size() << std::endl;
+            GLfloat rectangle[] = {
+                -1, 0.175, 0,
+                1, 0.175, 0,
+                -1, -0.175, 0,
+                1, 0.175, 0,
+                1, -0.175, 0,
+                -1, -0.175, 0,
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, rectangle, 6), {0, 0, 0}});
+        }
+        else if(angle == 1) {
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.175, 0.175, circle_vertex);
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0.7071,0.7071,0}});
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-0.7071,-0.7071,0}});
+            std::cerr << this->objects.size() << std::endl;
+            GLfloat rectangle[] = {
+                0.5833, 0.8308, 0,
+                -0.5833, -0.8308, 0,
+                -0.8308, -0.5833, 0,
+                0.5833, 0.8308, 0,
+                0.8308, 0.5833, 0,
+                -0.5833, -0.8308, 0
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, rectangle, 6), {0, 0, 0}});
+        }
+        else if(angle == 2) {
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.175, 0.175, circle_vertex);
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,1,0}});
+            std::cerr << this->objects.size() << std::endl;
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,-1,0}});
+            std::cerr << this->objects.size() << std::endl;
+            GLfloat rectangle[] = {
+                0.175, -1, 0,
+                0.175, 1, 0,
+                -0.175, -1, 0,
+                0.175, 1, 0,
+                -0.175, 1, 0,
+                -0.175, -1, 0
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, rectangle, 6), {0, 0, 0}});
+        }
+    }
+};
+
+class FlyingObject : public Combo {
+public:
+    FlyingObject() {};
+    FlyingObject(float x, float y, int type) : Combo(x, y) {
+        if(type == 0) {
+            //Backward Arrow
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.25, 0.25, circle_vertex);
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
+            GLfloat arrow_back[] = {
+                0, 0.2, 0,
+                0.1, 0.2, 0,
+                -0.1, 0, 0,
+                0.1, 0.2, 0,
+                0, 0, 0,
+                -0.1, 0, 0,
+                -0.1, 0, 0,
+                0, -0.2, 0,
+                0.1, -0.2, 0,
+                0, 0, 0,
+                0.1, -0.2, 0,
+                -0.1, 0, 0,
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, arrow_back, 12), {-0.025, 0, 0}});
+        }
+        else if(type == 1) {
+            //Forward Arrow
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.25, 0.25, circle_vertex);
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
+            GLfloat arrow_forward[] = {
+                0, 0.2, 0,
+                -0.1, 0.2, 0,
+                0.1, 0, 0,
+                -0.1, 0.2, 0,
+                0, 0, 0,
+                0.1, 0, 0,
+                0.1, 0, 0,
+                0, -0.2, 0,
+                -0.1, -0.2, 0,
+                0, 0, 0,
+                -0.1, -0.2, 0,
+                0.1, 0, 0,
+            };
+            this->objects.push_back({Object(0, 0, COLOR_YELLOW, arrow_forward, 12), {0.025, 0, 0}});
+        }
+        else if(type == 3) {
+            GLfloat circle_vertex[362*3];
+            create_heart(circle_vertex);
+            this->objects.push_back({Object(0, 0, COLOR_RED, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
+        }
+    }
 };
 
 #endif // BALL_H

@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "object.h"
 #include "handlers.hpp"
+
 using namespace std;
 
 GLMatrices Matrices;
@@ -15,11 +16,14 @@ GLFWwindow *window;
 Player p;
 Platform ground;
 deque <Coin> coins;
+FireLine test;
+Combo ok;
+GLfloat coin_vertex_buffer_data[362*3];
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
 float position = 0.0f;
 Timer t60(1.0 / 60);
-
+int score = 0;
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
 void draw() {
@@ -53,26 +57,54 @@ void draw() {
     glm::mat4 MVP;  // MVP = Projection * View * Model
 
     // Scene render
-    p.draw(VP);
+    test.draw(VP);
+    ok.draw(VP);
+//    p.draw(VP);
     ground.draw(VP);
     draw_collection(coins.begin(), coins.end(), VP);
+}
+
+void game_over(Player &p) {
+   cout << "Game Over" << endl;
+   exit(0);
 }
 
 void tick_input(GLFWwindow *window) {
     int left  = glfwGetKey(window, GLFW_KEY_LEFT);
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
+    int down = glfwGetKey(window, GLFW_KEY_DOWN);
     if(up) {
-        p.joy = true;
+//        p.joy = true;
+        ok.set_position(ok.x, ok.y+0.01f);
+    }
+    if(right) {
+        ok.set_position(ok.x+0.01f, ok.y);
+    }
+    if(left) {
+        ok.set_position(ok.x-0.01f, ok.y);
+    }
+    if(down) {
+        ok.set_position(ok.x, ok.y-0.01f);
     }
 }
 
 void tick_elements() {
     p.tick();
-    for (auto it = find_collision(coins.begin(), coins.end(), p); it != coins.end();it = find_collision(it, coins.end(), p)) {
+    //Coin collection
+    for (auto it = find_collision(coins.begin(), coins.end(), p, position); it != coins.end();it = find_collision(it, coins.end(), p, position)) {
+        score += it->value;
         it = coins.erase(it);
     }
-//    cerr << "out of loop" << endl;
+    //Combo test
+    if(collides(ok, test))
+        game_over(p);
+//    if(test.detect(p.box))
+//        game_over(p);
+    //Coin Spawning
+//    int coin_rand = rand();
+//    if(coin_rand < RAND_MAX/50)
+//        coins.push_back(Coin(position + 20, coin_rand%8, (coin_rand%2 == 0) ? 1 : 2, (coin_rand % 2 == 0) ? COLOR_FAWN : COLOR_YELLOW, coin_vertex_buffer_data, 362));
 //    position += 0.075f;
 //    p.position.x += 0.075f;
 }
@@ -120,7 +152,9 @@ void initGL(GLFWwindow *window, int width, int height) {
                 -1.0f, 1.0f, 1.0f,
                 1.0f,-1.0f, 1.0f
     };
-    p = Player(2,2, COLOR_PINK, 0, -0.05f/60.0f, 0, 0, player_vertex_buffer_data, 12*3);
+//    p = Player(2,2, COLOR_PINK, 0, -0.075f/60.0f, 0, 0, player_vertex_buffer_data, 12*3);
+    ok = Combo(2, 2);
+    ok.objects.push_back({Object(0, 0, COLOR_PINK, player_vertex_buffer_data, 12*3), {0, 0, 0}});
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
         -width_platform,-1,0,
@@ -131,10 +165,8 @@ void initGL(GLFWwindow *window, int width, int height) {
         -width_platform,-2,0
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
-    GLfloat coin_vertex_buffer_data[362*3];
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
-    coins.push_back(Coin(2,5, 5, COLOR_YELLOW, coin_vertex_buffer_data, 362));
-    coins.push_back(Coin(2,6, 5, COLOR_YELLOW, coin_vertex_buffer_data, 362));
+    test = FireLine(3, 4, 1);
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
@@ -185,11 +217,6 @@ int main(int argc, char **argv) {
     }
 
     quit(window);
-}
-
-bool detect_collision(bounding_box_t a, bounding_box_t b) {
-    return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
-           (abs(a.y - b.y) * 2 < (a.height + b.height));
 }
 
 void reset_screen() {

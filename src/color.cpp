@@ -7,3 +7,5 @@ const color_t COLOR_BACKGROUND = { 0, 51, 102 };
 const color_t COLOR_PINK = {234, 149, 252};
 const color_t COLOR_SECONDARY_PINK = {251, 204, 153};
 const color_t COLOR_YELLOW = {250, 238, 56};
+const color_t COLOR_FAWN = {229, 159, 113};
+const color_t COLOR_GREY  = {125, 125, 125};

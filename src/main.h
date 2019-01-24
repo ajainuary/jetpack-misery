@@ -87,9 +87,28 @@ extern const color_t COLOR_BACKGROUND;
 extern const color_t COLOR_PINK;
 extern const color_t COLOR_SECONDARY_PINK;
 extern const color_t COLOR_YELLOW;
+extern const color_t COLOR_FAWN;
+extern const color_t COLOR_GREY;
 // ---- Helpers ----
 extern float min(float x, float y);
 extern float max(float x, float y);
+extern bool detect_collision(bounding_box_t a, bounding_box_t b);
+extern void add_shapes(GLfloat first[], int first_size, GLfloat second[], int second_size, GLfloat answer[], float x, float y); //Primitive Mode: GL_TRIANGLES only
 // ---- Shape Creators ----
-extern void create_ellipse(float a, float b, GLfloat vertex_buffer_data[]);
+extern void create_ellipse(float a, float b, GLfloat vertex_buffer_data[], float origin_x = 0, float origin_y = 0);
+extern void create_heart(GLfloat vertex_buffer_data[]);
+// ---- Collision Detection ----
+typedef struct point {
+  float x, y;
+} point;
+
+typedef struct line {
+  float a, b, c;
+  // of the form ax+by+c=0
+} line;
+
+extern line passing(point p, point b);
+extern bool intersect(point a, point b, point c, point d);
+extern bool triangle_intersect(point A[], point B[]);
+extern bool poly_intersect(const std::vector<GLfloat> &A, int vertices_A, float origin_A_x, float origin_A_y, const std::vector<GLfloat> &B, int vertices_B, float origin_B_x, float origin_B_y);
 #endif
