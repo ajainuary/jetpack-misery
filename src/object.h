@@ -212,4 +212,19 @@ public:
     void tick();
 };
 
+class Water : public Object {
+public:
+    Water() {}
+    Water(float x, float y, GLfloat vertex_buffer_data[]) : Object(x, y, COLOR_WATER, vertex_buffer_data, 18){
+        this->v_x = 0.1f;
+        this->v_y = 0.01f;
+        this->a_x = -0.0008f;
+        this->a_y = -0.001f;
+        this->t = 0;
+    }
+    float v_x,v_y,a_x,a_y; //Parameter
+    int t;
+    bool tick();
+};
+
 #endif // BALL_H

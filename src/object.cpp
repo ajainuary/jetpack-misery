@@ -101,3 +101,16 @@ void Boomerang::tick() {
     t = t+1.0f;
     if(t == 361.0f) t = 0.0f;
 }
+
+bool Water::tick() {
+    float x = this->position.x, y = this->position.y;
+    this->v_x = this->v_x+this->a_x;
+    this->v_y = this->v_y+this->a_y;
+    x = x+this->v_x;
+    y = max(y+this->v_y, -1); //prevent sinking into ground
+    y = min(y, 6); //prevent going to space
+    this->rotation = 12*(this->t);
+    this->set_position(x, y);
+    ++t;
+    return this->t > 60;
+}

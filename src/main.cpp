@@ -19,6 +19,7 @@ deque <Coin> coins;
 FireLine test;
 Combo ok;
 Boomerang taki;
+deque <Water> fountain;
 GLfloat coin_vertex_buffer_data[362*3];
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
@@ -64,6 +65,7 @@ void draw() {
     ground.draw(VP);
     taki.draw(VP);
     draw_collection(coins.begin(), coins.end(), VP);
+    draw_collection(fountain.begin(), fountain.end(), VP);
 }
 
 void game_over(Player &p) {
@@ -76,6 +78,7 @@ void tick_input(GLFWwindow *window) {
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
     int down = glfwGetKey(window, GLFW_KEY_DOWN);
+    int space = glfwGetKey(window, GLFW_KEY_SPACE);
     if(up) {
 //        p.joy = true;
         ok.set_position(ok.x, ok.y+0.01f);
@@ -89,6 +92,41 @@ void tick_input(GLFWwindow *window) {
     if(down) {
         ok.set_position(ok.x, ok.y-0.01f);
     }
+    if(space && rand() % 8 == 0) {
+//        GLfloat water_vertex_buffer [] = {
+//            0, 0, 0,
+//            0.175, 0, 0,
+//            0.0875, 0.15155, 0,
+//            -0.0875, 0.15155, 0,
+//            0.0875, 0.15155, 0,
+//            0, 0, 0
+//            -0.0875, 0.15155, 0,
+//            0, 0, 0,
+//            -0.175, 0, 0,
+//            -0.175, 0, 0,
+//            0, 0, 0,
+//            -0.0875, -0.15155, 0,
+//            -0.0875, -0.15155, 0,
+//            0, 0, 0,
+//            0.0875, -0.15155, 0,
+//            0.0875, -0.15155, 0,
+//            0, 0, 0,
+//            0.175, 0, 0,
+//        };
+        GLfloat water_vertex_buffer[18*3];
+        for (int i = 0;i < 6; ++i) {
+            water_vertex_buffer[9*i] = 0;
+            water_vertex_buffer[9*i+1] = 0;
+            water_vertex_buffer[9*i+2] = 0;
+            water_vertex_buffer[9*i+3] = 0.175*cos(i*M_PI/3);
+            water_vertex_buffer[9*i+4] = 0.175*sin(i*M_PI/3);
+            water_vertex_buffer[9*i+5] = 0;
+            water_vertex_buffer[9*i+6] = 0.175*cos((i+1)*M_PI/3);
+            water_vertex_buffer[9*i+7] = 0.175*sin((i+1)*M_PI/3);
+            water_vertex_buffer[9*i+8] = 0;
+        }
+        fountain.push_back(Water(ok.x+1, ok.y+1-(float(rand())/(3*float(RAND_MAX))), water_vertex_buffer));
+    }
 }
 
 void tick_elements() {
@@ -98,6 +136,7 @@ void tick_elements() {
         score += it->value;
         it = coins.erase(it);
     }
+    for (auto it = fountain.begin(); it != fountain.end(); (it->tick()) ? it = fountain.erase(it) : ++it);
     //Combo test
     if(collides(ok, test))
         game_over(p);
