@@ -27,7 +27,8 @@ void Object::draw(glm::mat4 VP) {
 //    std::cerr << "Draw at " << this->position.x << ' ' << this->position.y << std::endl;
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
-    glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
+    glm::mat4 rotate    = glm::rotate((float) (this->rotation), glm::vec3(0, 0, 1));
+    std::cerr << this->rotation << std::endl;
     // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
     Matrices.model *= (translate * rotate);
@@ -65,11 +66,13 @@ void Player::tick() {
     this->set_position(x, y);
 }
 
-void Combo::set_position(float x, float y) {
+void Combo::set_position(float x, float y, float rotation) {
+//    std::cerr << rotation << std::endl;
     this->x = x;
     this->y = y;
     for(auto &o : this->objects) {
-        o.first.set_position(x+o.second.x, y+o.second.y);
+        o.first.set_position(x+o.second.x*cos(rotation)-o.second.y*sin(rotation), y+o.second.y*cos(rotation)+x*sin(rotation));
+        o.first.rotation = rotation;
 //        std::cerr << o.first.position.x << ' ' << o.first.position.y << ' ' << x+o.second.x << ' ' << y+o.second.y << std::endl;
     }
     return;
@@ -91,4 +94,23 @@ bool Combo::detect(bounding_box_t b) {
             return true;
     }
     return false;
+}
+
+void Boomerang::tick() {
+    this->set_position(a*cos(M_PI*(t/180)), b*sin(M_PI*(t/180)), M_PI*(t/30));
+    t = t+1.0f;
+    if(t == 361.0f) t = 0.0f;
+}
+
+bool Water::tick() {
+    float x = this->position.x, y = this->position.y;
+    this->v_x = this->v_x+this->a_x;
+    this->v_y = this->v_y+this->a_y;
+    x = x+this->v_x;
+    y = max(y+this->v_y, -1); //prevent sinking into ground
+    y = min(y, 6); //prevent going to space
+    this->rotation = 12*(this->t);
+    this->set_position(x, y);
+    ++t;
+    return this->t > 60;
 }
