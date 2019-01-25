@@ -23,23 +23,6 @@ private:
     VAO *object;
 };
 
-class Player : public Object {
-public:
-    Player() {}
-    Player(float x, float y, color_t color, float a_x, float a_y, float v_x, float v_y, GLfloat vertex_buffer_data[], int num_vertices) : Object(x,y,color, vertex_buffer_data, num_vertices)
-        {
-            this->a = glm::vec3(a_x, a_y, 0);
-            this->v = glm::vec3(v_x, v_y, 0);
-            this->joy = false;
-            this->lives = 1;
-        }
-    glm::vec3 a; //Acceleration +ve downwards -ve upwards
-    glm::vec3 v; //Velocities in x & y directions
-    bool joy; //Press the jetpack?
-    int lives;
-    void tick();
-};
-
 class Platform : public Object {
 public:
     Platform() {}
@@ -69,6 +52,106 @@ public:
     void draw(glm::mat4 VP);
     bool detect(bounding_box_t p);
 };
+
+class Player : public Combo {
+public:
+    Player() {}
+    Player(float x, float y, float a_x, float a_y, float v_x, float v_y) : Combo(x, y)
+        {
+        GLfloat leg[] = {
+            0, 0.2, 0,
+            0.1, 0.2, 0,
+            0, 0, 0,
+            0, 0, 0,
+            0.1, 0.2, 0,
+            0.1, 0, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_GREY, leg, 6), {-1.5, -0.075, 0}});
+        this->objects.push_back({Object(0, 0, COLOR_GREY, leg, 6), {-1.75, -0.075, 0}});
+        this->objects.push_back({Object(0, 0, COLOR_GREY, leg, 6), {-1, -0.075, 0}});
+        this->objects.push_back({Object(0, 0, COLOR_GREY, leg, 6), {-0.75, -0.075, 0}});
+        GLfloat tail[] = {
+            0, 0.1, 0,
+            0.2, 0.1, 0,
+            0, 0, 0,
+            0, 0, 0,
+            0.2, 0.1, 0,
+            0.2, 0, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_GREY, tail, 6), {-2.2, 0.35, 0}});
+        GLfloat body[] = {
+            0, 1, 0,
+            2, 1, 0,
+            0, 0, 0,
+            0, 0, 0,
+            2, 1, 0,
+            2, 0, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_PINK, body, 6), {-2, 0.05, 0}});
+
+        GLfloat face[] = {
+            0, 0, 0,
+            -0.5, 0.5, 0,
+            -0.25, 1, 0,
+            0, 0, 0,
+            0.25, 1, 0,
+            0.5, 0.5, 0,
+            -0.375, 0.75, 0,
+            0.375, 0.75, 0,
+            0, 0, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_GREY, face, 9), {-0.03, 0, 0}});
+        GLfloat curve_buffer[272*3];
+        curve_buffer[0] = 0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = 0.1+0.1*cos(M_PI*(float(i-180)/180.0f));
+            curve_buffer[3*i+4] = 0.1+0.1*sin(M_PI*(float(i-180)/180.0f));
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_BLACK, curve_buffer, 182, GL_TRIANGLE_FAN), {-0.05, 0.25, 0}});
+        curve_buffer[0] = 0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = 0.1+(0.1*cos(M_PI*(float(i-180)/180.0f)))*0.5;
+            curve_buffer[3*i+4] = 0.1+(0.1*sin(M_PI*(float(i-180)/180.0f)))*0.5;
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_GREY, curve_buffer, 182, GL_TRIANGLE_FAN), {-0.05, 0.25, 0}});
+        curve_buffer[0] = -0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = -0.1+0.1*cos(M_PI*(float(i-180)/180.0f));
+            curve_buffer[3*i+4] = 0.1+0.1*sin(M_PI*(float(i-180)/180.0f));
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_BLACK, curve_buffer, 182, GL_TRIANGLE_FAN), {0, 0.25, 0}});
+        curve_buffer[0] = -0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = -0.1+(0.1*cos(M_PI*(float(i-180)/180.0f)))*0.5;
+            curve_buffer[3*i+4] = 0.1+(0.1*sin(M_PI*(float(i-180)/180.0f)))*0.5;
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_GREY, curve_buffer, 182, GL_TRIANGLE_FAN), {0, 0.25, 0}});
+        GLfloat eye[] = {
+            -0.05, 0.05, 0,
+            0.05, 0.05, 0,
+            -0.05, -0.05, 0,
+            0.05, 0.05, 0,
+            0.05, -0.05, 0,
+            -0.05, -0.05, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_BLACK, eye, 6), {-0.2, 0.55, 0}});
+        this->objects.push_back({Object(0, 0, COLOR_BLACK, eye, 6), {0.15, 0.55, 0}});
+            this->a = glm::vec3(a_x, a_y, 0);
+            this->v = glm::vec3(v_x, v_y, 0);
+            this->joy = false;
+            this->lives = 1;
+        }
+    glm::vec3 a; //Acceleration +ve downwards -ve upwards
+    glm::vec3 v; //Velocities in x & y directions
+    bool joy; //Press the jetpack?
+    int lives;
+    void tick();
+};
+
 
 class FireLine : public Combo {
 public:

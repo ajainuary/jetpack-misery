@@ -17,7 +17,6 @@ Player p;
 Platform ground;
 deque <Coin> coins;
 FireLine test;
-Combo ok;
 Ring taki;
 deque <Water> fountain;
 GLfloat coin_vertex_buffer_data[362*3];
@@ -61,8 +60,8 @@ void draw() {
 
     // Scene render
     test.draw(VP);
-    ok.draw(VP);
-//    p.draw(VP);
+//    ok.draw(VP);
+    p.draw(VP);
     ground.draw(VP);
     taki.draw(VP);
 //    text.draw(VP);
@@ -83,39 +82,19 @@ void tick_input(GLFWwindow *window) {
     int down = glfwGetKey(window, GLFW_KEY_DOWN);
     int space = glfwGetKey(window, GLFW_KEY_SPACE);
     if(up) {
-//        p.joy = true;
-        ok.set_position(ok.x, ok.y+0.01f);
+        p.joy = true;
+//        p.set_position(p.x, p.y+0.01f);
     }
     if(right) {
-        ok.set_position(ok.x+0.01f, ok.y);
+        p.set_position(p.x+0.01f, p.y);
     }
     if(left) {
-        ok.set_position(ok.x-0.01f, ok.y);
+        p.set_position(p.x-0.01f, p.y);
     }
     if(down) {
-        ok.set_position(ok.x, ok.y-0.01f);
+        p.set_position(p.x, p.y-0.01f);
     }
     if(space && rand() % 8 == 0) {
-//        GLfloat water_vertex_buffer [] = {
-//            0, 0, 0,
-//            0.175, 0, 0,
-//            0.0875, 0.15155, 0,
-//            -0.0875, 0.15155, 0,
-//            0.0875, 0.15155, 0,
-//            0, 0, 0
-//            -0.0875, 0.15155, 0,
-//            0, 0, 0,
-//            -0.175, 0, 0,
-//            -0.175, 0, 0,
-//            0, 0, 0,
-//            -0.0875, -0.15155, 0,
-//            -0.0875, -0.15155, 0,
-//            0, 0, 0,
-//            0.0875, -0.15155, 0,
-//            0.0875, -0.15155, 0,
-//            0, 0, 0,
-//            0.175, 0, 0,
-//        };
         GLfloat water_vertex_buffer[18*3];
         for (int i = 0;i < 6; ++i) {
             water_vertex_buffer[9*i] = 0;
@@ -128,20 +107,20 @@ void tick_input(GLFWwindow *window) {
             water_vertex_buffer[9*i+7] = 0.175*sin((i+1)*M_PI/3);
             water_vertex_buffer[9*i+8] = 0;
         }
-        fountain.push_back(Water(ok.x+1, ok.y+1-(float(rand())/(3*float(RAND_MAX))), water_vertex_buffer));
+        fountain.push_back(Water(p.x, p.y+0.5-(float(rand())/(3*float(RAND_MAX))), water_vertex_buffer));
     }
 }
 
 void tick_elements() {
     p.tick();
     //Coin collection
-    for (auto it = find_collision(coins.begin(), coins.end(), p, position); it != coins.end();it = find_collision(it, coins.end(), p, position)) {
-        score += it->value;
-        it = coins.erase(it);
-    }
+//    for (auto it = find_collision(coins.begin(), coins.end(), p, position); it != coins.end();it = find_collision(it, coins.end(), p, position)) {
+//        score += it->value;
+//        it = coins.erase(it);
+//    }
     for (auto it = fountain.begin(); it != fountain.end(); (it->tick()) ? it = fountain.erase(it) : ++it);
     //Combo test
-    if(collides(ok, test))
+    if(collides(p, test))
         --p.lives;
 //    if(test.detect(p.box))
 //        game_over(p);
@@ -198,9 +177,9 @@ void initGL(GLFWwindow *window, int width, int height) {
                 -1.0f, 1.0f, 1.0f,
                 1.0f,-1.0f, 1.0f
     };
-//    p = Player(2,2, COLOR_PINK, 0, -0.075f/60.0f, 0, 0, player_vertex_buffer_data, 12*3);
-    ok = Combo(2, 2);
-    ok.objects.push_back({Object(0, 0, COLOR_PINK, player_vertex_buffer_data, 12*3), {0, 0, 0}});
+    p = Player(2,2, 0, -0.075f/60.0f, 0, 0);
+//    ok = Combo(2, 2);
+//    ok.objects.push_back({Object(0, 0, COLOR_PINK, player_vertex_buffer_data, 12*3), {0, 0, 0}});
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
         -width_platform,-1,0,

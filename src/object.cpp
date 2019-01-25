@@ -51,11 +51,11 @@ void Object::tick() {
 
 void Player::tick() {
     //Standard physics
-    float x = this->position.x, y = this->position.y;
+    float x = this->x, y = this->y;
     this->v.x = this->v.x+this->a.x;
     this->v.y = this->v.y+this->a.y;
     x = x+this->v.x;
-    y = max(y+this->v.y, 0); //prevent sinking into ground
+    y = max(y+this->v.y, -1); //prevent sinking into ground
     //Jetpack physics
     if(this->joy)
     {
