@@ -122,3 +122,13 @@ void Magnet::tick(Player p) {
 //        p.a.x +=
 //    }
 }
+
+void FireBeam::tick() {
+    float x = this->x, y = this->y;
+    if(y >= 7)
+        this->direction = -1;
+    if(y <= 0)
+        this->direction = 1;
+    y += (this->direction) * 0.03f;
+    this->set_position(x, y);
+}

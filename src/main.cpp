@@ -19,6 +19,7 @@ deque <Coin> coins;
 FireLine test;
 Ring taki;
 deque <Water> fountain;
+FireBeam take;
 GLfloat coin_vertex_buffer_data[362*3];
 Display text, text2;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
@@ -64,6 +65,7 @@ void draw() {
     p.draw(VP);
     ground.draw(VP);
     taki.draw(VP);
+    take.draw(VP);
 //    text.draw(VP);
 //    text2.draw(VP);
     draw_collection(coins.begin(), coins.end(), VP);
@@ -83,16 +85,15 @@ void tick_input(GLFWwindow *window) {
     int space = glfwGetKey(window, GLFW_KEY_SPACE);
     if(up) {
         p.joy = true;
-//        p.set_position(p.x, p.y+0.01f);
     }
     if(right) {
-        p.set_position(p.x+0.01f, p.y);
+        p.set_position(p.x+0.06f, p.y);
     }
     if(left) {
-        p.set_position(p.x-0.01f, p.y);
+        p.set_position(p.x-0.06f, p.y);
     }
     if(down) {
-        p.set_position(p.x, p.y-0.01f);
+        p.set_position(p.x, p.y-0.02f);
     }
     if(space && rand() % 8 == 0) {
         GLfloat water_vertex_buffer[18*3];
@@ -113,6 +114,7 @@ void tick_input(GLFWwindow *window) {
 
 void tick_elements() {
     p.tick();
+    take.tick();
     //Coin collection
 //    for (auto it = find_collision(coins.begin(), coins.end(), p, position); it != coins.end();it = find_collision(it, coins.end(), p, position)) {
 //        score += it->value;
@@ -190,6 +192,7 @@ void initGL(GLFWwindow *window, int width, int height) {
         -width_platform,-2,0
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
+    take = FireBeam(8);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
     test = FireLine(3, 4, 1);
     taki = Ring(8,4);

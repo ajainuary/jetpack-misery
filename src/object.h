@@ -214,6 +214,32 @@ public:
     }
 };
 
+class FireBeam : public Combo {
+public:
+     FireBeam() {};
+     FireBeam(float x) : Combo(x, 0) {
+         GLfloat circle_vertex[362*3];
+         create_ellipse(0.175, 0.175, circle_vertex);
+         std::cerr << this->objects.size() << std::endl;
+         this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {2,0,0}});
+         std::cerr << this->objects.size() << std::endl;
+         this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-2,0,0}});
+         std::cerr << this->objects.size() << std::endl;
+         GLfloat rectangle[] = {
+             -2, 0.175, 0,
+             2, 0.175, 0,
+             -2, -0.175, 0,
+             2, 0.175, 0,
+             2, -0.175, 0,
+             -2, -0.175, 0,
+         };
+         this->objects.push_back({Object(0, 0, COLOR_RED, rectangle, 6), {0, 0, 0}});
+         this->direction = 1;
+     };
+     void tick();
+     int direction;
+};
+
 class FlyingObject : public Combo {
 public:
     FlyingObject() {};
