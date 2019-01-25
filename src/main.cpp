@@ -18,7 +18,7 @@ Platform ground;
 deque <Coin> coins;
 FireLine test;
 Combo ok;
-Magnet taki;
+Ring taki;
 deque <Water> fountain;
 GLfloat coin_vertex_buffer_data[362*3];
 Display text, text2;
@@ -213,7 +213,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
     test = FireLine(3, 4, 1);
-    taki = Magnet(6,4, 0);
+    taki = Ring(8,4);
     text = Display(6, 5, '0');
     text2 = Display(6.8, 5, '0');
     // Create and compile our GLSL program from the shaders

@@ -257,6 +257,30 @@ public:
         };
         this->objects.push_back({Object(0, 0, COLOR_GREY, box, 6), {0.3, -0.2, 0}});
         this->objects.push_back({Object(0, 0, COLOR_GREY, box, 6), {-0.5, -0.2, 0}});
+    };
+    void tick(Player p);
+};
+
+class Ring : public Combo {
+public:
+    Ring() {}
+    Ring(float x, float y) : Combo(x, y) {
+        GLfloat vertex_buffer_data[182*3];
+        vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
+        for(int i = 0; i < 181; ++i) {
+            vertex_buffer_data[3*i+3] = 3*cos(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+4] = 3*sin(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_RED, vertex_buffer_data, 182, GL_TRIANGLE_FAN), {0, 0, 0}});
+        vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
+        for(int i = 0; i < 181; ++i) {
+            vertex_buffer_data[3*i+3] = 2.7*cos(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+4] = 2.7*sin(M_PI*(float(i)/180.0f));
+            vertex_buffer_data[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_BACKGROUND, vertex_buffer_data, 182, GL_TRIANGLE_FAN), {0, 0, 0}});
+        this->set_position(x, y, M_PI);
     }
 };
 
