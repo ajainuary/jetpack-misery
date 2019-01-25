@@ -16,10 +16,13 @@ GLFWwindow *window;
 Player p;
 Platform ground;
 deque <Coin> coins;
-FireLine test;
+bool randi;
+deque<FireLine> firelines;
+deque<FireBeam> firebeams;
+deque<FlyingObject> fos;
 Ring taki;
-deque <Water> fountain;
-FireBeam take;
+deque<Water> fountain;
+deque<Boomerang> booms;
 GLfloat coin_vertex_buffer_data[362*3];
 Display text, text2;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
@@ -60,24 +63,24 @@ void draw() {
     glm::mat4 MVP;  // MVP = Projection * View * Model
 
     // Scene render
-    test.draw(VP);
-//    ok.draw(VP);
-    p.draw(VP);
+    draw_collection(firelines.begin(), firelines.end(), VP);
+    draw_collection(firebeams.begin(), firebeams.end(), VP);
+    draw_collection(coins.begin(), coins.end(), VP);
     ground.draw(VP);
     taki.draw(VP);
-    take.draw(VP);
-//    text.draw(VP);
-//    text2.draw(VP);
-    draw_collection(coins.begin(), coins.end(), VP);
+    p.draw(VP);
+    draw_collection(fos.begin(), fos.end(), VP);
+    draw_collection(booms.begin(), booms.end(), VP);
     draw_collection(fountain.begin(), fountain.end(), VP);
 }
 
 void game_over(Player &p) {
-   cout << "Game Over" << endl;
+   cout << "Game Over " << score << endl;
    exit(0);
 }
 
 void tick_input(GLFWwindow *window) {
+    randi = false;
     int left  = glfwGetKey(window, GLFW_KEY_LEFT);
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
@@ -88,14 +91,19 @@ void tick_input(GLFWwindow *window) {
     }
     if(right) {
         p.set_position(p.x+0.06f, p.y);
+        if(p.x - position > 4)
+            position += 0.06f;
+        randi = true;
     }
     if(left) {
         p.set_position(p.x-0.06f, p.y);
+        if(position - p.x < 2)
+            position -= 0.06f;
     }
     if(down) {
         p.set_position(p.x, p.y-0.02f);
     }
-    if(space && rand() % 8 == 0) {
+    if(space && rand() % 20 == 0) {
         GLfloat water_vertex_buffer[18*3];
         for (int i = 0;i < 6; ++i) {
             water_vertex_buffer[9*i] = 0;
@@ -110,30 +118,80 @@ void tick_input(GLFWwindow *window) {
         }
         fountain.push_back(Water(p.x, p.y+0.5-(float(rand())/(3*float(RAND_MAX))), water_vertex_buffer));
     }
+    for(auto it = firebeams.begin(); it != firebeams.end(); ++it)
+        it->tick();
+    for (auto it = fos.begin(); it != fos.end(); ++it)
+        it->tick();
+    for(auto it = booms.begin(); it != booms.end(); ++it)
+        it->tick();
+    position = p.x-2;
 }
 
 void tick_elements() {
     p.tick();
-    take.tick();
-    //Coin collection
-//    for (auto it = find_collision(coins.begin(), coins.end(), p, position); it != coins.end();it = find_collision(it, coins.end(), p, position)) {
-//        score += it->value;
-//        it = coins.erase(it);
-//    }
     for (auto it = fountain.begin(); it != fountain.end(); (it->tick()) ? it = fountain.erase(it) : ++it);
-    //Combo test
-    if(collides(p, test))
-        --p.lives;
-//    if(test.detect(p.box))
-//        game_over(p);
     //Coin Spawning
-//    int coin_rand = rand();
-//    if(coin_rand < RAND_MAX/50)
-//        coins.push_back(Coin(position + 20, coin_rand%8, (coin_rand%2 == 0) ? 1 : 2, (coin_rand % 2 == 0) ? COLOR_FAWN : COLOR_YELLOW, coin_vertex_buffer_data, 362));
-//    position += 0.075f;
-//    p.position.x += 0.075f;
-    //Boomerang test
-//    taki.tick();
+    if(randi) {
+        int coin_rand = rand();
+        if(coin_rand < RAND_MAX/50)
+            coins.push_back(Coin(position + 20, coin_rand%8, (coin_rand%2 == 0) ? 1 : 2, (coin_rand % 2 == 0) ? COLOR_FAWN : COLOR_YELLOW, coin_vertex_buffer_data, 362));
+        int fire_rand = rand();
+        if(fire_rand < RAND_MAX/150)
+            firelines.push_back(FireLine(position + 20, fire_rand%8, fire_rand%3));
+        else if(fire_rand < ((RAND_MAX/150)+(RAND_MAX/300)))
+        {
+
+            firebeams.push_back(FireBeam(position + 20));
+        }
+        int fo_rand = rand();
+        if(fo_rand < RAND_MAX/500)
+            fos.push_back(FlyingObject(position+20, 3.5, fo_rand%3));
+        int boom_rand = rand();
+        if(boom_rand < RAND_MAX/500)
+            booms.push_back(Boomerang(position+14, 3.5, position+7, 3.5, 7, 3.5));
+
+    }
+    //Collision killing
+    for(auto i = fountain.begin(); i != fountain.end(); ++i)
+    {
+        for(auto j = firebeams.begin(); j != firebeams.end(); ++j)
+            if(collides(*i, *j))
+            {
+                 i = fountain.erase(i);
+                 --i;
+                 j = firebeams.erase(j);
+                break;
+            }
+        for(auto j = firelines.begin(); j != firelines.end(); ++j)
+            if(collides(*i, *j))
+            {
+                i = fountain.erase(i);
+                --i;
+                j = firelines.erase(j);
+               break;
+            }
+    }
+    //Player killing
+    for(auto j = firebeams.begin(); j != firebeams.end() && !p.invincible; ++j)
+        if(collides_combo(p, *j))
+            game_over(p);
+    for(auto j = firelines.begin(); j != firelines.end() && !p.invincible; ++j)
+        if(collides_combo(p, *j))
+            game_over(p);
+    for(auto j = booms.begin(); j != booms.end() && !p.invincible; ++j)
+        if(collides_combo(p, *j))
+            game_over(p);
+        //Coin collection
+    for(auto j = coins.begin(); j != coins.end(); ++j)
+    {
+        if(collides(*j, p))
+        {
+            score += j->value;
+            j = coins.erase(j);
+            --j;
+        }
+    }
+    taki.tick(p);
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -141,47 +199,7 @@ void tick_elements() {
 void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
-    GLfloat player_vertex_buffer_data[] = {
-                -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-                -1.0f,-1.0f, 1.0f,
-                -1.0f, 1.0f, 1.0f, // triangle 1 : end
-                1.0f, 1.0f,-1.0f, // triangle 2 : begin
-                -1.0f,-1.0f,-1.0f,
-                -1.0f, 1.0f,-1.0f, // triangle 2 : end
-                1.0f,-1.0f, 1.0f,
-                -1.0f,-1.0f,-1.0f,
-                1.0f,-1.0f,-1.0f,
-                1.0f, 1.0f,-1.0f,
-                1.0f,-1.0f,-1.0f,
-                -1.0f,-1.0f,-1.0f,
-                -1.0f,-1.0f,-1.0f,
-                -1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f,-1.0f,
-                1.0f,-1.0f, 1.0f,
-                -1.0f,-1.0f, 1.0f,
-                -1.0f,-1.0f,-1.0f,
-                -1.0f, 1.0f, 1.0f,
-                -1.0f,-1.0f, 1.0f,
-                1.0f,-1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f,
-                1.0f,-1.0f,-1.0f,
-                1.0f, 1.0f,-1.0f,
-                1.0f,-1.0f,-1.0f,
-                1.0f, 1.0f, 1.0f,
-                1.0f,-1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f,-1.0f,
-                -1.0f, 1.0f,-1.0f,
-                1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f,-1.0f,
-                -1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f, 1.0f,
-                1.0f,-1.0f, 1.0f
-    };
     p = Player(2,2, 0, -0.075f/60.0f, 0, 0);
-//    ok = Combo(2, 2);
-//    ok.objects.push_back({Object(0, 0, COLOR_PINK, player_vertex_buffer_data, 12*3), {0, 0, 0}});
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
         -width_platform,-1,0,
@@ -192,11 +210,9 @@ void initGL(GLFWwindow *window, int width, int height) {
         -width_platform,-2,0
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
-    take = FireBeam(8);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
-    test = FireLine(3, 4, 1);
     taki = Ring(8,4);
-    text = Display(6, 5, '0');
+    text = Display(6, 5, '3');
     text2 = Display(6.8, 5, '0');
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");

@@ -15,10 +15,11 @@ public:
     void draw(glm::mat4 VP);
     void set_position(float x, float y);
     void tick();
+    float delta_x, delta_y;
     std::vector<GLfloat> mesh;
     int num_vertices;
     bounding_box_t box;
-    bool advanced_collision_detection;
+    bool collision_detection,advanced_collision_detection;
 private:
     VAO *object;
 };
@@ -109,6 +110,7 @@ public:
             curve_buffer[3*i+5] = 0;
         }
         this->objects.push_back({Object(0, 0, COLOR_BLACK, curve_buffer, 182, GL_TRIANGLE_FAN), {-0.05, 0.25, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
         curve_buffer[0] = 0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
         for(int i = 0; i < 271; ++i) {
             curve_buffer[3*i+3] = 0.1+(0.1*cos(M_PI*(float(i-180)/180.0f)))*0.5;
@@ -116,6 +118,7 @@ public:
             curve_buffer[3*i+5] = 0;
         }
         this->objects.push_back({Object(0, 0, COLOR_GREY, curve_buffer, 182, GL_TRIANGLE_FAN), {-0.05, 0.25, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
         curve_buffer[0] = -0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
         for(int i = 0; i < 271; ++i) {
             curve_buffer[3*i+3] = -0.1+0.1*cos(M_PI*(float(i-180)/180.0f));
@@ -123,6 +126,7 @@ public:
             curve_buffer[3*i+5] = 0;
         }
         this->objects.push_back({Object(0, 0, COLOR_BLACK, curve_buffer, 182, GL_TRIANGLE_FAN), {0, 0.25, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
         curve_buffer[0] = -0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
         for(int i = 0; i < 271; ++i) {
             curve_buffer[3*i+3] = -0.1+(0.1*cos(M_PI*(float(i-180)/180.0f)))*0.5;
@@ -130,6 +134,7 @@ public:
             curve_buffer[3*i+5] = 0;
         }
         this->objects.push_back({Object(0, 0, COLOR_GREY, curve_buffer, 182, GL_TRIANGLE_FAN), {0, 0.25, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
         GLfloat eye[] = {
             -0.05, 0.05, 0,
             0.05, 0.05, 0,
@@ -144,11 +149,14 @@ public:
             this->v = glm::vec3(v_x, v_y, 0);
             this->joy = false;
             this->lives = 1;
+        this->invincible = false;
+        this->gravity = true;
         }
     glm::vec3 a; //Acceleration +ve downwards -ve upwards
     glm::vec3 v; //Velocities in x & y directions
     bool joy; //Press the jetpack?
     int lives;
+    bool invincible, gravity;
     void tick();
 };
 
@@ -162,8 +170,10 @@ public:
             create_ellipse(0.175, 0.175, circle_vertex);
             std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {1,0,0}});
+            (this->objects.end()-1)->first.collision_detection = false;
             std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-1,0,0}});
+            (this->objects.end()-1)->first.collision_detection = false;
             std::cerr << this->objects.size() << std::endl;
             GLfloat rectangle[] = {
                 -1, 0.175, 0,
@@ -180,8 +190,10 @@ public:
             create_ellipse(0.175, 0.175, circle_vertex);
             std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0.7071,0.7071,0}});
+            (this->objects.end()-1)->first.collision_detection = false;
             std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-0.7071,-0.7071,0}});
+            (this->objects.end()-1)->first.collision_detection = false;
             std::cerr << this->objects.size() << std::endl;
             GLfloat rectangle[] = {
                 0.5833, 0.8308, 0,
@@ -198,8 +210,10 @@ public:
             create_ellipse(0.175, 0.175, circle_vertex);
             std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,1,0}});
+            (this->objects.end()-1)->first.collision_detection = false;
             std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,-1,0}});
+            (this->objects.end()-1)->first.collision_detection = false;
             std::cerr << this->objects.size() << std::endl;
             GLfloat rectangle[] = {
                 0.175, -1, 0,
@@ -222,8 +236,10 @@ public:
          create_ellipse(0.175, 0.175, circle_vertex);
          std::cerr << this->objects.size() << std::endl;
          this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {2,0,0}});
+         (this->objects.end()-1)->first.collision_detection = false;
          std::cerr << this->objects.size() << std::endl;
          this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-2,0,0}});
+         (this->objects.end()-1)->first.collision_detection = false;
          std::cerr << this->objects.size() << std::endl;
          GLfloat rectangle[] = {
              -2, 0.175, 0,
@@ -286,12 +302,13 @@ public:
             };
             this->objects.push_back({Object(0, 0, COLOR_YELLOW, arrow_forward, 12), {0.025, 0, 0}});
         }
-        else if(type == 3) {
+        else if(type == 2) {
             GLfloat circle_vertex[362*3];
             create_heart(circle_vertex);
             this->objects.push_back({Object(0, 0, COLOR_RED, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
         }
     }
+    void tick();
 };
 
 class Boomerang : public Combo {
@@ -391,6 +408,7 @@ public:
         this->objects.push_back({Object(0, 0, COLOR_BACKGROUND, vertex_buffer_data, 182, GL_TRIANGLE_FAN), {0, 0, 0}});
         this->set_position(x, y, M_PI);
     }
+    void tick(Player &p);
 };
 
 class Display : public Combo {

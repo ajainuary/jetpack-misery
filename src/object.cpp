@@ -11,8 +11,11 @@ Object::Object(float x, float y, color_t color, GLfloat vertex_buffer_data[], in
         max_y = max(max_y, vertex_buffer_data[3*i+1]);
         min_y = min(min_y, vertex_buffer_data[3*i+1]);
     }
-    this->box = {x, y, max_x-min_x, max_y-min_y};
+    this->box = {((max_x+min_x)/2)+x, ((max_y+min_y)/2)+y, max_x-min_x, max_y-min_y};
+    this->delta_x = this->box.x-x;
+    this->delta_y = this->box.y-y;
     this->num_vertices = num_vertices;
+    this->collision_detection = true;
     if(primitive_mode == GL_TRIANGLES) {
         this->advanced_collision_detection = true;
         this->mesh = std::vector<GLfloat>(vertex_buffer_data, vertex_buffer_data+(num_vertices*3));
@@ -28,7 +31,7 @@ void Object::draw(glm::mat4 VP) {
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
     glm::mat4 rotate    = glm::rotate((float) (this->rotation), glm::vec3(0, 0, 1));
-    std::cerr << this->rotation << std::endl;
+//    std::cerr << tis->rotation << std::endl;
     // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
     Matrices.model *= (translate * rotate);
@@ -39,8 +42,8 @@ void Object::draw(glm::mat4 VP) {
 
 void Object::set_position(float x, float y) {
     this->position = glm::vec3(x, y, 0);
-    this->box.x = x;
-    this->box.y = y;
+    this->box.x = x+this->delta_x;
+    this->box.y = y+this->delta_y;
 }
 
 void Object::tick() {
@@ -53,7 +56,8 @@ void Player::tick() {
     //Standard physics
     float x = this->x, y = this->y;
     this->v.x = this->v.x+this->a.x;
-    this->v.y = this->v.y+this->a.y;
+    if(this->gravity)
+        this->v.y = this->v.y+this->a.y;
     x = x+this->v.x;
     y = max(y+this->v.y, -1); //prevent sinking into ground
     //Jetpack physics
@@ -97,7 +101,7 @@ bool Combo::detect(bounding_box_t b) {
 }
 
 void Boomerang::tick() {
-    this->set_position(a*cos(M_PI*(t/180)), b*sin(M_PI*(t/180)), M_PI*(t/30));
+    this->set_position(a*cos(M_PI*(t/180))+origin_x, b*sin(M_PI*(t/180))+origin_y, M_PI*(t/30));
     t = t+1.0f;
     if(t == 361.0f) t = 0.0f;
 }
@@ -131,4 +135,27 @@ void FireBeam::tick() {
         this->direction = 1;
     y += (this->direction) * 0.03f;
     this->set_position(x, y);
+}
+
+void FlyingObject::tick() {
+    float x = this->x, y = this->y;
+    if(x == -100)
+        x = 5000;
+    x -= 0.02f;
+    y = 3.5 + 3.5*sin(x);
+    this->set_position(x, y);
+}
+
+void Ring::tick(Player &p) {
+    float r_2 = (p.x - this->x)*(p.x - this->x)+(p.y - this->y)*(p.y - this->y);
+    if(2*2 < r_2 && r_2 < 3.5*3.5 && p.y < this->y)
+    {
+        p.invincible = true;
+        p.v.y = 0;
+        p.v.x = 0;
+        p.set_position(p.x+0.02*(r_2*((this->y - p.y)/sqrt(r_2))), p.y-0.02*(r_2*((this->x - p.x)/sqrt(r_2))));
+    }
+    else {
+        p.invincible = false;
+    }
 }

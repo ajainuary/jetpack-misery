@@ -16,7 +16,8 @@ It find_collision(It begin, It end, const T& obj, float position) {
 
 template <class A, class B>
 bool objects_collide(const A& obj1, const B& obj2) {
-    if(detect_collision(obj1.box, obj2.box)) {
+    if(detect_collision(obj1.box, obj2.box) && obj1.collision_detection && obj2.collision_detection) {
+//        std::cerr << "here" << std::endl;
         if(obj1.advanced_collision_detection == true && obj2.advanced_collision_detection == true)
         {
             if(poly_intersect(obj1.mesh, obj1.num_vertices, obj1.position.x, obj1.position.y, obj2.mesh, obj2.num_vertices, obj2.position.x, obj2.position.y))
@@ -29,11 +30,21 @@ bool objects_collide(const A& obj1, const B& obj2) {
             return true;
         }
     }
+//    std::cerr << obj1.box.x << ' ' << obj1.box.y << ' ' << obj1.box.width << ' ' << obj1.box.height << ',' << obj2.box.x << ' ' << obj2.box.y << ' ' << obj2.box.width << ' ' << obj2.box.height << std::endl;
     return false;
 }
 
 template <class A, class B>
 bool collides(const A& x, const B& y) {
+//    for(auto &p : x.objects)
+        for(auto &q : y.objects)
+            if(objects_collide(x, q.first))
+                return true;
+    return false;
+}
+
+template <class A, class B>
+bool collides_combo(const A& x, const B& y) {
     for(auto &p : x.objects)
         for(auto &q : y.objects)
             if(objects_collide(p.first, q.first))
