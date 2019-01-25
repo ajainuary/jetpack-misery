@@ -20,7 +20,7 @@ bool randi;
 deque<FireLine> firelines;
 deque<FireBeam> firebeams;
 deque<FlyingObject> fos;
-Ring taki;
+Magnet taki;
 deque<Water> fountain;
 deque<Boomerang> booms;
 GLfloat coin_vertex_buffer_data[362*3];
@@ -192,6 +192,7 @@ void tick_elements() {
         }
     }
     taki.tick(p);
+    cerr << p.x << ' ' << p.y << endl;
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -211,7 +212,7 @@ void initGL(GLFWwindow *window, int width, int height) {
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
-    taki = Ring(8,4);
+    taki = Magnet(8,4, 0);
     text = Display(6, 5, '3');
     text2 = Display(6.8, 5, '0');
     // Create and compile our GLSL program from the shaders

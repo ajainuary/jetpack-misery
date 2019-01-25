@@ -116,15 +116,17 @@ bool Water::tick() {
     this->rotation = 12*(this->t);
     this->set_position(x, y);
     ++t;
-    return this->t > 60;
+    return this->t > 120;
 }
 
-void Magnet::tick(Player p) {
-    return;
-    //    float r_2 = (p.position.x - this->x)*(p.position.x - this->x)+(p.position.y - this->y)*(p.position.y - this->y);
-//    if(r_2 < 25) {
-//        p.a.x +=
-//    }
+void Magnet::tick(Player &p) {
+    float r_2 = (p.x - this->x)*(p.x - this->x)+(p.y - this->y)*(p.y - this->y);
+    if(r_2 <= 16)
+    {
+        p.v.y = 0;
+        p.v.x = 0;
+        p.set_position(p.x+3.0f*(((this->x - p.x)/((sqrt(r_2)*r_2)+150))), p.y+3.0f*(((this->y - p.y)/((sqrt(r_2)*r_2)+150))));
+    }
 }
 
 void FireBeam::tick() {
@@ -153,7 +155,7 @@ void Ring::tick(Player &p) {
         p.invincible = true;
         p.v.y = 0;
         p.v.x = 0;
-        p.set_position(p.x+0.02*(r_2*((this->y - p.y)/sqrt(r_2))), p.y-0.02*(r_2*((this->x - p.x)/sqrt(r_2))));
+        p.set_position(p.x+0.01*(r_2*((this->y - p.y)/sqrt(r_2))), p.y-0.01*(r_2*((this->x - p.x)/sqrt(r_2))));
     }
     else {
         p.invincible = false;

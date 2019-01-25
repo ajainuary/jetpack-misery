@@ -384,7 +384,7 @@ public:
         this->objects.push_back({Object(0, 0, COLOR_GREY, box, 6), {0.3, -0.2, 0}});
         this->objects.push_back({Object(0, 0, COLOR_GREY, box, 6), {-0.5, -0.2, 0}});
     };
-    void tick(Player p);
+    void tick(Player &p);
 };
 
 class Ring : public Combo {
