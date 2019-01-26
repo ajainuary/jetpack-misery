@@ -26,6 +26,8 @@ deque<Water> fountain;
 deque<Boomerang> booms;
 GLfloat coin_vertex_buffer_data[362*3];
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
+float top_corner, left_corner, bottom_corner, right_corner;
+float cam_y = 0;
 float camera_rotation_angle = 0;
 float position = 0.0f;
 Timer t60(1.0 / 60);
@@ -54,7 +56,11 @@ void draw() {
     // Compute Camera matrix (view)
     //  Matrices.view = glm::lookAt( eye, target, up ); // Rotating Camera for 3D
     // Don't change unless you are sure!!
-    Matrices.view = glm::lookAt(glm::vec3(position, 0, 3), glm::vec3(position, 0, 0), glm::vec3(0, 1, 0)); // Fixed camera for 2D (ortho) in XY plane
+    if(p.y < bottom_corner + 1)
+        cam_y = p.y - bottom_corner - 1;
+    if(p.y > screen_center_y)
+        cam_y = p.y - screen_center_y;
+    Matrices.view = glm::lookAt(glm::vec3(position, cam_y, 3), glm::vec3(position, cam_y, 0), glm::vec3(0, 1, 0)); // Fixed camera for 2D (ortho) in XY plane
 
     // Compute ViewProject matrix as view/camera might not be changed for this frame (basic scenario)
     // Don't change unless you are sure!!
@@ -137,11 +143,12 @@ void tick_input(GLFWwindow *window) {
         it->tick();
     for(auto it = booms.begin(); it != booms.end(); ++it)
         it->tick();
-    position = p.x-2;
+    position = p.x-2*screen_zoom;
 
 }
 
 void tick_elements() {
+    cerr << p.y << ' ' << cam_y << ' ' << bottom_corner << endl;
     if(timer == 0)
         p.invincible = false;
     else {
@@ -285,12 +292,12 @@ void tick_elements() {
         it->tick(p);
     for (int i = 0;i < 3; ++i) {
         for (int j = 0;j < 10; ++j) {
-            score_display[i][j].set_position(position+(11/screen_zoom)+0.8*i, (6.7 + t_y)*screen_zoom);
+            score_display[i][j].set_position(position+11+0.8*i, 6.7+cam_y);
         }
     }
     cerr << position+(11/screen_zoom) << endl;
     for (int i = 0;i < 13; ++i) {
-        life_display[i].set_position(position-1+0.9*i, (7 + t_y)*screen_zoom);
+        life_display[i].set_position(position-1+0.9*i, 7+cam_y);
     }
 }
 
@@ -299,6 +306,7 @@ void tick_elements() {
 void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
+    cam_y = 0;
     p = Player(2,2, 0, -0.075f/60.0f, 0, 0);
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
@@ -372,9 +380,9 @@ int main(int argc, char **argv) {
 }
 
 void reset_screen() {
-    float top    = screen_center_y + 4.5f / screen_zoom;
-    float bottom = screen_center_y - 4.5f / screen_zoom;
-    float left   = screen_center_x - 8 / screen_zoom;
-    float right  = screen_center_x + 8 / screen_zoom;
-    Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
+     top_corner    = screen_center_y + 4.5f / screen_zoom;
+     bottom_corner = screen_center_y - 4.5f / screen_zoom;
+     left_corner   = screen_center_x - 8 / screen_zoom;
+     right_corner  = screen_center_x + 8 / screen_zoom;
+    Matrices.projection = glm::ortho(left_corner, right_corner, bottom_corner, top_corner, 0.1f, 500.0f);
 }
