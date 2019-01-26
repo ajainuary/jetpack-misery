@@ -361,7 +361,7 @@ public:
 class Magnet : public Combo {
 public:
     Magnet() {}
-    Magnet(float x, float y, float rotation) : Combo(x, y){
+    Magnet(float x, float y) : Combo(x, y){
         GLfloat vertex_buffer_data[182*3];
         vertex_buffer_data[0] = 0.0f; vertex_buffer_data[1] = 0.0f; vertex_buffer_data[2] = 0.0f;
         for(int i = 0; i < 181; ++i) {

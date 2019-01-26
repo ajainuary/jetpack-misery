@@ -85,4 +85,14 @@ void mouseButton(GLFWwindow *window, int button, int action, int mods) {
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     // Do something
+    if(yoffset < 0) {
+        screen_zoom -= 0.1;
+        screen_zoom = max(screen_zoom, 0.4);
+    }
+    else if(yoffset > 0) {
+        screen_zoom += 0.1;
+        screen_zoom = min(screen_zoom, 1.7);
+    }
+    reset_screen();
+    std::cerr << screen_zoom << std::endl;
 }

@@ -20,7 +20,8 @@ bool randi;
 deque<FireLine> firelines;
 deque<FireBeam> firebeams;
 deque<FlyingObject> fos;
-Magnet taki;
+deque<Magnet> mags;
+deque<Ring> rings;
 deque<Water> fountain;
 deque<Boomerang> booms;
 GLfloat coin_vertex_buffer_data[362*3];
@@ -65,18 +66,19 @@ void draw() {
     glm::mat4 MVP;  // MVP = Projection * View * Model
 
     // Scene render
+    draw_collection(mags.begin(), mags.end(), VP);
+    draw_collection(rings.begin(), rings.end(), VP);
     draw_collection(firelines.begin(), firelines.end(), VP);
     draw_collection(firebeams.begin(), firebeams.end(), VP);
     draw_collection(coins.begin(), coins.end(), VP);
     ground.draw(VP);
-    taki.draw(VP);
     p.draw(VP);
     for (int i = 0;i < p.lives; ++i) {
-        life_display[i].draw(VP);
+        life_display[i].draw(glm::scale(glm::vec3(1/screen_zoom, 1/screen_zoom, 1))*VP);
     }
-    score_display[0][score / 100].draw(VP);
-    score_display[1][(score / 10) % 10].draw(VP);
-    score_display[2][score % 10].draw(VP);
+    score_display[0][score / 100].draw(glm::scale(glm::vec3(1/screen_zoom, 1/screen_zoom, 1))*VP);
+    score_display[1][(score / 10) % 10].draw(glm::scale(glm::vec3(1/screen_zoom, 1/screen_zoom, 1))*VP);
+    score_display[2][score % 10].draw(glm::scale(glm::vec3(1/screen_zoom, 1/screen_zoom, 1))*VP);
     draw_collection(fos.begin(), fos.end(), VP);
     draw_collection(booms.begin(), booms.end(), VP);
     draw_collection(fountain.begin(), fountain.end(), VP);
@@ -178,6 +180,25 @@ void tick_elements() {
         int boom_rand = rand();
         if(boom_rand < RAND_MAX/500)
             booms.push_back(Boomerang(position+14, 3.5, position+7, 3.5, 7, 3.5));
+        int mag_ring_rand = rand();
+        if(mag_ring_rand < RAND_MAX/400)
+        {
+            if(mag_ring_rand % 2 == 0) {
+                mags.push_back(Magnet(position+20, 3.5+(mag_ring_rand%3)));
+                for (auto it = firelines.begin(); it != firelines.end(); ++it)
+                    if(collides_combo(*mags.rbegin(), *it))
+                    {
+                        mags.pop_back();
+                    }
+            } else {
+                rings.push_back(Ring(position+20, 3.5+(mag_ring_rand%2)));
+                for (auto it = firelines.begin(); it != firelines.end(); ++it)
+                    if(collides_combo(*rings.rbegin(), *it))
+                    {
+                        rings.pop_back();
+                    }
+            }
+        }
 
     }
     //Collision killing
@@ -258,14 +279,18 @@ void tick_elements() {
             --j;
         }
     }
-    taki.tick(p);
+    for(auto it = mags.begin(); it != mags.end(); ++it)
+        it->tick(p);
+    for(auto it = rings.begin(); it != rings.end(); ++it)
+        it->tick(p);
     for (int i = 0;i < 3; ++i) {
         for (int j = 0;j < 10; ++j) {
-            score_display[i][j].set_position(position+11+0.8*i, 6.7);
+            score_display[i][j].set_position(position+(11/screen_zoom)+0.8*i, (6.7 + t_y)*screen_zoom);
         }
     }
+    cerr << position+(11/screen_zoom) << endl;
     for (int i = 0;i < 13; ++i) {
-        life_display[i].set_position(position-1+0.9*i, 7);
+        life_display[i].set_position(position-1+0.9*i, (7 + t_y)*screen_zoom);
     }
 }
 
@@ -286,7 +311,6 @@ void initGL(GLFWwindow *window, int width, int height) {
 };
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
-    taki = Magnet(8,4, 0);
     for (int i = 0;i < 3; ++i) {
         for (int j = 0;j < 10; ++j) {
             score_display[i][j] = Display(8+0.8*i, 7, '0'+j);
