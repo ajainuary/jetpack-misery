@@ -346,11 +346,11 @@ public:
 class Water : public Object {
 public:
     Water() {}
-    Water(float x, float y, GLfloat vertex_buffer_data[]) : Object(x, y, COLOR_WATER, vertex_buffer_data, 18){
-        this->v_x = 0.1f;
-        this->v_y = 0.01f;
-        this->a_x = -0.0008f;
-        this->a_y = -0.001f;
+    Water(float x, float y, GLfloat vertex_buffer_data[],float a_x = 0.0008f, float v_x = 0.01f, float v_y = 0.01f, float a_y = -0.001f) : Object(x, y, COLOR_WATER, vertex_buffer_data, 18){
+        this->v_x = v_x;
+        this->v_y = v_y;
+        this->a_x = a_x;
+        this->a_y = a_y;
         this->t = 0;
     }
     float v_x,v_y,a_x,a_y; //Parameter
@@ -413,6 +413,83 @@ public:
         this->set_position(x, y, M_PI);
     }
     void tick(Player &p);
+};
+
+class Dragon : public Combo {
+public:
+    Dragon() {}
+    Dragon(float x, float y) : Combo(x, y) {
+        GLfloat face[] = {
+            0, 0, 0,
+            0.5, -0.5, 0,
+            1, -0.25, 0,
+            0, 0, 0,
+            1, 0.25, 0,
+            0.5, 0.5, 0,
+            0.75, -0.375, 0,
+            0.75, 0.375, 0,
+            0, 0, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_ORANGE, face, 9), {0, -0.03, 0}});
+        GLfloat curve_buffer[272*3];
+        curve_buffer[0] = 0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = 0.1+0.1*cos(M_PI*(float(i)/180.0f));
+            curve_buffer[3*i+4] = 0.1+0.1*sin(M_PI*(float(i)/180.0f));
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_DRAGONITE, curve_buffer, 182, GL_TRIANGLE_FAN), {0.25, -0.05, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
+        curve_buffer[0] = 0.1f; curve_buffer[1] = 0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = 0.1+(0.1*cos(M_PI*(float(i)/180.0f)))*0.5;
+            curve_buffer[3*i+4] = 0.1+(0.1*sin(M_PI*(float(i)/180.0f)))*0.5;
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_ORANGE, curve_buffer, 182, GL_TRIANGLE_FAN), {0.25, -0.05, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
+        curve_buffer[0] = 0.1f; curve_buffer[1] = -0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = 0.1+0.1*cos(M_PI*(float(i)/180.0f));
+            curve_buffer[3*i+4] = -0.1+0.1*sin(M_PI*(float(i)/180.0f));
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_DRAGONITE, curve_buffer, 182, GL_TRIANGLE_FAN), {0.25, 0, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
+        curve_buffer[0] = 0.1f; curve_buffer[1] = -0.1f; curve_buffer[2] = 0.0f;
+        for(int i = 0; i < 271; ++i) {
+            curve_buffer[3*i+3] = 0.1+(0.1*cos(M_PI*(float(i)/180.0f)))*0.5;
+            curve_buffer[3*i+4] = -0.1+(0.1*sin(M_PI*(float(i)/180.0f)))*0.5;
+            curve_buffer[3*i+5] = 0;
+        }
+        this->objects.push_back({Object(0, 0, COLOR_ORANGE, curve_buffer, 182, GL_TRIANGLE_FAN), {0.25, 0, 0}});
+        (this->objects.end()-1)->first.collision_detection = false;
+        GLfloat eye[] = {
+            0.05, -0.05, 0,
+            0.05, 0.05, 0,
+            -0.05, -0.05, 0,
+            0.05, 0.05, 0,
+            -0.05, 0.05, 0,
+            -0.05, -0.05, 0,
+        };
+        this->objects.push_back({Object(0, 0, COLOR_DRAGONITE, eye, 6), {0.5, -0.2, 0}});
+        this->objects.push_back({Object(0, 0, COLOR_DRAGONITE, eye, 6), {0.55, 0.15, 0}});
+        GLfloat body[] = {
+            -0.125, 0.125, 0,
+            0.125, 0.25, 0,
+            -0.125, -0.125, 0,
+            0.125, 0.25, 0,
+            -0.125, -0.125, 0,
+            0.125, -0.25, 0,
+        };
+        for(int i = 0; i < 25; ++i)
+            this->objects.push_back({Object(0, 0, COLOR_ORANGE, body, 6), {1+i*0.3, -0.03, 0}});
+        this->life = 5;
+    }
+    float t; //Parameter
+    std::deque<Water> fountain;
+    int life;
+    void tick();
 };
 
 class Display : public Combo {

@@ -159,3 +159,29 @@ void Ring::tick(Player &p) {
         p.invincible = false;
     }
 }
+
+void Dragon::tick() {
+    this->t = (t+1);
+    for(int i = 0; i < 7; ++i)
+        this->objects[i].second = {this->objects[i].second.x, this->y + 2*sin(t*(M_PI/60.0f)), 0};
+    for(int i = 7; i < 32; ++i)
+    {
+        this->objects[i].second = {this->objects[i].second.x, this->y + 2*sin(t*(M_PI/60.0f)-((i-7)*0.2f)), 0};
+    }
+    if(std::rand() % 15 == 0)
+    {
+        GLfloat water_vertex_buffer[18*3];
+        for (int i = 0;i < 6; ++i) {
+            water_vertex_buffer[9*i] = 0;
+            water_vertex_buffer[9*i+1] = 0;
+            water_vertex_buffer[9*i+2] = 0;
+            water_vertex_buffer[9*i+3] = 0.175*cos(i*M_PI/3);
+            water_vertex_buffer[9*i+4] = 0.175*sin(i*M_PI/3);
+            water_vertex_buffer[9*i+5] = 0;
+            water_vertex_buffer[9*i+6] = 0.175*cos((i+1)*M_PI/3);
+            water_vertex_buffer[9*i+7] = 0.175*sin((i+1)*M_PI/3);
+            water_vertex_buffer[9*i+8] = 0;
+        }
+        this->fountain.push_back(Water(this->x, this->y + 2*sin(t*(M_PI/60.0f))+2, water_vertex_buffer, -0.008f));
+    }
+}

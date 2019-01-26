@@ -13,3 +13,5 @@ const color_t COLOR_WOOD = {205, 197, 180};
 const color_t COLOR_SECONDARY_WOOD = {133, 117, 110};
 const color_t COLOR_WATER = {40, 175, 176};
 const color_t COLOR_WHITE = {255, 255, 255};
+const color_t COLOR_ORANGE = {240, 107, 50};
+const color_t COLOR_DRAGONITE = {247, 162, 53};

@@ -93,6 +93,8 @@ extern const color_t COLOR_WOOD;
 extern const color_t COLOR_SECONDARY_WOOD;
 extern const color_t COLOR_WATER;
 extern const color_t COLOR_WHITE;
+extern const color_t COLOR_ORANGE;
+extern const color_t COLOR_DRAGONITE;
 // ---- Helpers ----
 extern float min(float x, float y);
 extern float max(float x, float y);

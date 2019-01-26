@@ -24,6 +24,7 @@ deque<Magnet> mags;
 deque<Ring> rings;
 deque<Water> fountain;
 deque<Boomerang> booms;
+deque<Dragon> chus;
 GLfloat coin_vertex_buffer_data[362*3];
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float top_corner, left_corner, bottom_corner, right_corner;
@@ -31,8 +32,8 @@ float cam_y = 0;
 float camera_rotation_angle = 0;
 float position = 0.0f;
 Timer t60(1.0 / 60);
-int score = 200;
-int timer = 0;
+int score = 0;
+int timer = -1;
 array <array <Display, 10>, 3> score_display;
 array <FlyingObject, 13> life_display;
 /* Render the scene with openGL */
@@ -88,17 +89,23 @@ void draw() {
     draw_collection(fos.begin(), fos.end(), VP);
     draw_collection(booms.begin(), booms.end(), VP);
     draw_collection(fountain.begin(), fountain.end(), VP);
+    draw_collection(chus.begin(), chus.end(), VP);
+    for(auto it = chus.begin(); it != chus.end(); ++it)
+        draw_collection(it->fountain.begin(), it->fountain.end(), VP);
 }
 
 void game_over(Player &p) {
-    if(p.lives > 0)
+    if(timer > 0)
+        return;
+    if(p.lives > 0 && !p.invincible && timer <= 0)
     {
         --p.lives;
         p.invincible = true;
         timer = 60;
+//        cout << "set timer to 360" << endl;
         return;
     }
-   cout << "Game Over " << score << endl;
+//   cout << "Game Over called " << score << endl;
    exit(0);
 }
 
@@ -148,10 +155,14 @@ void tick_input(GLFWwindow *window) {
 }
 
 void tick_elements() {
-    cerr << p.y << ' ' << cam_y << ' ' << bottom_corner << endl;
     if(timer == 0)
+    {
         p.invincible = false;
-    else {
+        timer = -1;
+//        cerr << "falsify" << endl;
+    }
+    else if(timer > 0){
+//        cerr <<"Timer: "<< timer << endl;
         --timer;
     }
     p.tick();
@@ -206,7 +217,11 @@ void tick_elements() {
                     }
             }
         }
-
+        int drag_rand = rand();
+        if(drag_rand < RAND_MAX/1000)
+        {
+            chus.push_back(Dragon(position + 20, 1.5));
+        }
     }
     //Collision killing
     for(auto i = fountain.begin(); i != fountain.end(); ++i)
@@ -229,8 +244,18 @@ void tick_elements() {
                 --i;
                 j = firelines.erase(j);
                 --j;
+                kill = false;
                break;
             }
+        for(auto j = chus.begin(); j != chus.end() && kill; ++j)
+            if(collides(*i, *j) && rand() % 25) {
+                i = fountain.erase(i);
+                --i;
+                j = chus.erase(j);
+                --j;
+                break;
+            }
+
     }
     for(auto j = firebeams.begin(); j != firebeams.end(); ++j)
         if(j->x < position - 5)
@@ -295,10 +320,28 @@ void tick_elements() {
             score_display[i][j].set_position(position+11+0.8*i, 6.7+cam_y);
         }
     }
-    cerr << position+(11/screen_zoom) << endl;
+    for(auto j = chus.begin(); j != chus.end(); ++j)
+    {
+        j->tick();
+        for (auto it = j->fountain.begin(); it != j->fountain.end(); (it->tick()) ? it = j->fountain.erase(it) : ++it);
+        if(collides_combo(*j, p) && !p.invincible) {
+            game_over(p);
+        }
+        for(auto it = j->fountain.begin(); it != j->fountain.end() && !p.invincible; ++it)
+        {
+            if(collides(*it, p))
+            {
+                game_over(p);
+                it = j->fountain.erase(it);
+                --it;
+            }
+        }
+    }
     for (int i = 0;i < 13; ++i) {
         life_display[i].set_position(position-1+0.9*i, 7+cam_y);
     }
+
+
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -306,6 +349,7 @@ void tick_elements() {
 void initGL(GLFWwindow *window, int width, int height) {
     /* Objects should be created before any other gl function and shaders */
     // Create the models
+    timer = -1;
     cam_y = 0;
     p = Player(2,2, 0, -0.075f/60.0f, 0, 0);
     float width_platform = 5000.0f;
