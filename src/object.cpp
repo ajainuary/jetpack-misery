@@ -121,11 +121,11 @@ bool Water::tick() {
 
 void Magnet::tick(Player &p) {
     float r_2 = (p.x - this->x)*(p.x - this->x)+(p.y - this->y)*(p.y - this->y);
-    if(r_2 <= 16)
+    if(r_2 <= 25)
     {
         p.v.y = 0;
         p.v.x = 0;
-        p.set_position(p.x+3.0f*(((this->x - p.x)/((sqrt(r_2)*r_2)+150))), p.y+3.0f*(((this->y - p.y)/((sqrt(r_2)*r_2)+150))));
+        p.set_position(p.x+5.0f*(((this->x - p.x)/((sqrt(r_2)*r_2)+350))), p.y+5.0f*(((this->y - p.y)/((sqrt(r_2)*r_2)+350))));
     }
 }
 
