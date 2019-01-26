@@ -57,7 +57,8 @@ void Player::tick() {
     if(this->gravity)
         this->v.y = this->v.y+this->a.y;
     x = x+this->v.x;
-    y = max(y+this->v.y, -1); //prevent sinking into ground
+    if(this->gravity)
+        y = max(y+this->v.y, -1); //prevent sinking into ground
     //Jetpack physics
     if(this->joy)
     {

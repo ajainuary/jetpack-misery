@@ -116,6 +116,7 @@ void tick_input(GLFWwindow *window) {
     int up = glfwGetKey(window, GLFW_KEY_UP);
     int down = glfwGetKey(window, GLFW_KEY_DOWN);
     int space = glfwGetKey(window, GLFW_KEY_SPACE);
+    int anti_g = glfwGetKey(window, GLFW_KEY_G);
     if(up) {
         p.joy = true;
     }
@@ -128,6 +129,10 @@ void tick_input(GLFWwindow *window) {
     }
     if(down) {
         p.set_position(p.x, p.y-0.02f);
+    }
+    if(anti_g)
+    {
+        p.gravity = !p.gravity;
     }
     if(space && rand() % 20 == 0) {
         GLfloat water_vertex_buffer[18*3];

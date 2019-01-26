@@ -692,7 +692,7 @@ public:
                 curve_buffer[3*i+5] = 0;
             }
             this->objects.push_back({Object(0, 0, COLOR_BACKGROUND, curve_buffer, 362, GL_TRIANGLE_FAN), {0, 0.075, 0}});
-            this->set_position(this->x, this->y+0.4);
+            this->set_position(this->x, this->y+0.6);
         } else if(c == '9') {
             GLfloat curve_buffer[362*3];
             curve_buffer[0] = 0.15f; curve_buffer[1] = 0.15f; curve_buffer[2] = 0.0f;
