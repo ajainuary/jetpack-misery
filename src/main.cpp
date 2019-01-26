@@ -362,7 +362,6 @@ void initGL(GLFWwindow *window, int width, int height) {
     timer = -1;
     cam_y = 0;
     p = Player(2,2, 0, -0.075f/60.0f, 0, 0);
-    fos.push_back(FlyingObject(5,4,3));
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
         -width_platform,-1,0,
