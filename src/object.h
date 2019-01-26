@@ -148,14 +148,16 @@ public:
             this->a = glm::vec3(a_x, a_y, 0);
             this->v = glm::vec3(v_x, v_y, 0);
             this->joy = false;
-            this->lives = 1;
+            this->lives = 9;
         this->invincible = false;
         this->gravity = true;
+        this->speed = 0.06f;
         }
     glm::vec3 a; //Acceleration +ve downwards -ve upwards
     glm::vec3 v; //Velocities in x & y directions
     bool joy; //Press the jetpack?
     int lives;
+    float speed;
     bool invincible, gravity;
     void tick();
 };
@@ -307,7 +309,9 @@ public:
             create_heart(circle_vertex);
             this->objects.push_back({Object(0, 0, COLOR_RED, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
         }
+        this->type = type;
     }
+    float type;
     void tick();
 };
 
@@ -483,7 +487,7 @@ public:
                 curve_buffer[3*i+5] = 0;
             }
             this->objects.push_back({Object(0, 0, COLOR_BACKGROUND, curve_buffer, 272, GL_TRIANGLE_FAN), {0, 0.075, 0}});
-            this->set_position(this->x, this->y+0.2);
+            this->set_position(this->x, this->y+0.4);
         } else if(c == '4') {
             GLfloat vertex_buffer_data[] = {
                 0,0.2,0,
@@ -611,7 +615,7 @@ public:
                 curve_buffer[3*i+5] = 0;
             }
             this->objects.push_back({Object(0, 0, COLOR_BACKGROUND, curve_buffer, 362, GL_TRIANGLE_FAN), {0, 0.075, 0}});
-            this->set_position(this->x, this->y+0.2);
+            this->set_position(this->x, this->y+0.4);
         } else if(c == '9') {
             GLfloat curve_buffer[362*3];
             curve_buffer[0] = 0.15f; curve_buffer[1] = 0.15f; curve_buffer[2] = 0.0f;

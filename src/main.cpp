@@ -24,12 +24,14 @@ Magnet taki;
 deque<Water> fountain;
 deque<Boomerang> booms;
 GLfloat coin_vertex_buffer_data[362*3];
-Display text, text2;
 float screen_zoom = 1, screen_center_x = 6, screen_center_y = 3;
 float camera_rotation_angle = 0;
 float position = 0.0f;
 Timer t60(1.0 / 60);
-int score = 0;
+int score = 200;
+int timer = 0;
+array <array <Display, 10>, 3> score_display;
+array <FlyingObject, 13> life_display;
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
 void draw() {
@@ -69,12 +71,25 @@ void draw() {
     ground.draw(VP);
     taki.draw(VP);
     p.draw(VP);
+    for (int i = 0;i < p.lives; ++i) {
+        life_display[i].draw(VP);
+    }
+    score_display[0][score / 100].draw(VP);
+    score_display[1][(score / 10) % 10].draw(VP);
+    score_display[2][score % 10].draw(VP);
     draw_collection(fos.begin(), fos.end(), VP);
     draw_collection(booms.begin(), booms.end(), VP);
     draw_collection(fountain.begin(), fountain.end(), VP);
 }
 
 void game_over(Player &p) {
+    if(p.lives > 0)
+    {
+        --p.lives;
+        p.invincible = true;
+        timer = 60;
+        return;
+    }
    cout << "Game Over " << score << endl;
    exit(0);
 }
@@ -90,15 +105,11 @@ void tick_input(GLFWwindow *window) {
         p.joy = true;
     }
     if(right) {
-        p.set_position(p.x+0.06f, p.y);
-        if(p.x - position > 4)
-            position += 0.06f;
+        p.set_position(p.x+p.speed, p.y);
         randi = true;
     }
     if(left) {
-        p.set_position(p.x-0.06f, p.y);
-        if(position - p.x < 2)
-            position -= 0.06f;
+        p.set_position(p.x-p.speed, p.y);
     }
     if(down) {
         p.set_position(p.x, p.y-0.02f);
@@ -125,26 +136,44 @@ void tick_input(GLFWwindow *window) {
     for(auto it = booms.begin(); it != booms.end(); ++it)
         it->tick();
     position = p.x-2;
+
 }
 
 void tick_elements() {
+    if(timer == 0)
+        p.invincible = false;
+    else {
+        --timer;
+    }
     p.tick();
     for (auto it = fountain.begin(); it != fountain.end(); (it->tick()) ? it = fountain.erase(it) : ++it);
     //Coin Spawning
     if(randi) {
         int coin_rand = rand();
-        if(coin_rand < RAND_MAX/50)
+        if(coin_rand < (RAND_MAX/50)*(p.speed/0.06f))
             coins.push_back(Coin(position + 20, coin_rand%8, (coin_rand%2 == 0) ? 1 : 2, (coin_rand % 2 == 0) ? COLOR_FAWN : COLOR_YELLOW, coin_vertex_buffer_data, 362));
         int fire_rand = rand();
-        if(fire_rand < RAND_MAX/150)
+        if(fire_rand < (RAND_MAX/150)*(p.speed/0.06f))
+        {
             firelines.push_back(FireLine(position + 20, fire_rand%8, fire_rand%3));
-        else if(fire_rand < ((RAND_MAX/150)+(RAND_MAX/300)))
+            for (auto it = firebeams.begin(); it != firebeams.end(); ++it)
+                if(collides_combo(*firelines.rbegin(), *it))
+                {
+                    firelines.pop_back();
+                }
+        }
+        else if(fire_rand < (((RAND_MAX/150)+(RAND_MAX/300))*(p.speed/0.06f)))
         {
 
             firebeams.push_back(FireBeam(position + 20));
+            for (auto it = firelines.begin(); it != firelines.end(); ++it)
+                if(collides_combo(*firebeams.rbegin(), *it))
+                {
+                    firebeams.pop_back();
+                }
         }
         int fo_rand = rand();
-        if(fo_rand < RAND_MAX/500)
+        if(fo_rand < (RAND_MAX/500)*(p.speed/0.06f))
             fos.push_back(FlyingObject(position+20, 3.5, fo_rand%3));
         int boom_rand = rand();
         if(boom_rand < RAND_MAX/500)
@@ -154,23 +183,48 @@ void tick_elements() {
     //Collision killing
     for(auto i = fountain.begin(); i != fountain.end(); ++i)
     {
+        bool kill = true;
         for(auto j = firebeams.begin(); j != firebeams.end(); ++j)
             if(collides(*i, *j))
             {
                  i = fountain.erase(i);
                  --i;
+                 kill = false;
                  j = firebeams.erase(j);
+                 --j;
                 break;
             }
-        for(auto j = firelines.begin(); j != firelines.end(); ++j)
+        for(auto j = firelines.begin(); j != firelines.end() && kill; ++j)
             if(collides(*i, *j))
             {
                 i = fountain.erase(i);
                 --i;
                 j = firelines.erase(j);
+                --j;
                break;
             }
     }
+    for(auto j = firebeams.begin(); j != firebeams.end(); ++j)
+        if(j->x < position - 5)
+        {
+             j = firebeams.erase(j);
+             --j;
+            break;
+        }
+    for(auto j = firelines.begin(); j != firelines.end(); ++j)
+        if(j->x < position - 5)
+        {
+            j = firelines.erase(j);
+            --j;
+           break;
+        }
+    for(auto j = coins.begin(); j != coins.end(); ++j)
+        if(j->position.x < position - 5)
+        {
+            j = coins.erase(j);
+            --j;
+           break;
+        }
     //Player killing
     for(auto j = firebeams.begin(); j != firebeams.end() && !p.invincible; ++j)
         if(collides_combo(p, *j))
@@ -191,8 +245,28 @@ void tick_elements() {
             --j;
         }
     }
+    //fos
+    for (auto j = fos.begin(); j != fos.end(); ++j) {
+        if(collides_combo(p, *j)) {
+            if(j->type == 0)
+                p.speed /=2;
+            else if(j->type == 1)
+                p.speed *= 2;
+            else if(j->type == 2)
+                ++p.lives;
+            j = fos.erase(j);
+            --j;
+        }
+    }
     taki.tick(p);
-    cerr << p.x << ' ' << p.y << endl;
+    for (int i = 0;i < 3; ++i) {
+        for (int j = 0;j < 10; ++j) {
+            score_display[i][j].set_position(position+11+0.8*i, 6.7);
+        }
+    }
+    for (int i = 0;i < 13; ++i) {
+        life_display[i].set_position(position-1+0.9*i, 7);
+    }
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -213,8 +287,14 @@ void initGL(GLFWwindow *window, int width, int height) {
     ground = Platform(COLOR_SECONDARY_PINK, platform_vertex_buffer_data);
     create_ellipse(0.175, 0.25, coin_vertex_buffer_data);
     taki = Magnet(8,4, 0);
-    text = Display(6, 5, '3');
-    text2 = Display(6.8, 5, '0');
+    for (int i = 0;i < 3; ++i) {
+        for (int j = 0;j < 10; ++j) {
+            score_display[i][j] = Display(8+0.8*i, 7, '0'+j);
+        }
+    }
+    for (int i = 0;i < 13; ++i) {
+        life_display[i] = FlyingObject(-1+0.9*i, 7, 2);
+    }
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
