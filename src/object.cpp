@@ -124,7 +124,7 @@ void Magnet::tick(Player &p) {
     {
         p.v.y = 0;
         p.v.x = 0;
-        p.set_position(p.x+5.0f*(((this->x - p.x)/((sqrt(r_2)*r_2)+350))), p.y+5.0f*(((this->y - p.y)/((sqrt(r_2)*r_2)+350))));
+        p.set_position(p.x+4.0f*(((this->x - p.x)/((sqrt(r_2)*r_2)+450))), p.y+4.0f*(((this->y - p.y)/((sqrt(r_2)*r_2)+450))));
     }
 }
 
