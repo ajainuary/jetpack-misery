@@ -170,13 +170,13 @@ public:
         if(angle == 0) {
             GLfloat circle_vertex[362*3];
             create_ellipse(0.175, 0.175, circle_vertex);
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {1,0,0}});
             (this->objects.end()-1)->first.collision_detection = false;
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-1,0,0}});
             (this->objects.end()-1)->first.collision_detection = false;
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             GLfloat rectangle[] = {
                 -1, 0.175, 0,
                 1, 0.175, 0,
@@ -190,13 +190,13 @@ public:
         else if(angle == 1) {
             GLfloat circle_vertex[362*3];
             create_ellipse(0.175, 0.175, circle_vertex);
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0.7071,0.7071,0}});
             (this->objects.end()-1)->first.collision_detection = false;
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-0.7071,-0.7071,0}});
             (this->objects.end()-1)->first.collision_detection = false;
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             GLfloat rectangle[] = {
                 0.5833, 0.8308, 0,
                 -0.5833, -0.8308, 0,
@@ -210,13 +210,13 @@ public:
         else if(angle == 2) {
             GLfloat circle_vertex[362*3];
             create_ellipse(0.175, 0.175, circle_vertex);
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,1,0}});
             (this->objects.end()-1)->first.collision_detection = false;
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,-1,0}});
             (this->objects.end()-1)->first.collision_detection = false;
-            std::cerr << this->objects.size() << std::endl;
+//            std::cerr << this->objects.size() << std::endl;
             GLfloat rectangle[] = {
                 0.175, -1, 0,
                 0.175, 1, 0,
@@ -236,13 +236,13 @@ public:
      FireBeam(float x) : Combo(x, 0) {
          GLfloat circle_vertex[362*3];
          create_ellipse(0.175, 0.175, circle_vertex);
-         std::cerr << this->objects.size() << std::endl;
+//         std::cerr << this->objects.size() << std::endl;
          this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {2,0,0}});
          (this->objects.end()-1)->first.collision_detection = false;
-         std::cerr << this->objects.size() << std::endl;
+//         std::cerr << this->objects.size() << std::endl;
          this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {-2,0,0}});
          (this->objects.end()-1)->first.collision_detection = false;
-         std::cerr << this->objects.size() << std::endl;
+//         std::cerr << this->objects.size() << std::endl;
          GLfloat rectangle[] = {
              -2, 0.175, 0,
              2, 0.175, 0,
