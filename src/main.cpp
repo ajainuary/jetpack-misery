@@ -134,7 +134,7 @@ void tick_input(GLFWwindow *window) {
     {
         p.gravity = !p.gravity;
     }
-    if(space && rand() % 20 == 0) {
+    if(space && rand() % 10 == 0) {
         GLfloat water_vertex_buffer[18*3];
         for (int i = 0;i < 6; ++i) {
             water_vertex_buffer[9*i] = 0;
@@ -199,7 +199,7 @@ void tick_elements() {
         }
         int fo_rand = rand();
         if(fo_rand < (RAND_MAX/500)*(p.speed/0.06f))
-            fos.push_back(FlyingObject(position+20, 3.5, fo_rand%3));
+            fos.push_back(FlyingObject(position+20, 3.5, fo_rand%4));
         int boom_rand = rand();
         if(boom_rand < RAND_MAX/500)
             booms.push_back(Boomerang(position+14, 3.5, position+7, 3.5, 7, 3.5));
@@ -312,6 +312,11 @@ void tick_elements() {
                 p.speed *= 2;
             else if(j->type == 2)
                 ++p.lives;
+            else if(j->type == 3)
+            {
+                p.invincible = true;
+                timer = 3600;
+            }
             j = fos.erase(j);
             --j;
         }
@@ -357,6 +362,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     timer = -1;
     cam_y = 0;
     p = Player(2,2, 0, -0.075f/60.0f, 0, 0);
+    fos.push_back(FlyingObject(5,4,3));
     float width_platform = 5000.0f;
     GLfloat platform_vertex_buffer_data [] = {
         -width_platform,-1,0,

@@ -308,6 +308,27 @@ public:
             GLfloat circle_vertex[362*3];
             create_heart(circle_vertex);
             this->objects.push_back({Object(0, 0, COLOR_RED, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
+        } else if(type == 3) {
+            GLfloat circle_vertex[362*3];
+            create_ellipse(0.3, 0.3, circle_vertex);
+            this->objects.push_back({Object(0, 0, COLOR_GREY, circle_vertex, 362, GL_TRIANGLE_FAN), {0,0,0}});
+                 GLfloat vertex_buffer_data1[] = {
+                   0.2f, 0.3f, 0.0f,
+                   0.4f, 0.14f, 0.0f,
+                   0.4f, 0.5f, 0.0f,
+                   0.2f, 0.3f, 0.0f,
+                   0.2f, 0.6f, 0.0f,
+                   0.4f, 0.5f, 0.0f,
+
+                   0.4f, 0.14f, 0.0f,
+                   0.6f, 0.3f, 0.0f,
+                   0.6f, 0.6f, 0.0f,
+                   0.4f, 0.14f, 0.0f,
+                   0.4f, 0.5f, 0.0f,
+                   0.6f, 0.6f, 0.0f,
+                 };
+                 this->objects.push_back({Object(0, 0, COLOR_GREEN, vertex_buffer_data1, 12), {-0.4,-0.4,0}});
+
         }
         this->type = type;
     }
@@ -346,7 +367,7 @@ public:
 class Water : public Object {
 public:
     Water() {}
-    Water(float x, float y, GLfloat vertex_buffer_data[],float a_x = 0.0008f, float v_x = 0.01f, float v_y = 0.01f, float a_y = -0.001f) : Object(x, y, COLOR_WATER, vertex_buffer_data, 18){
+    Water(float x, float y, GLfloat vertex_buffer_data[],float a_x = 0.0008f, float v_x = 0.02f, float v_y = 0.02f, float a_y = -0.001f) : Object(x, y, COLOR_WATER, vertex_buffer_data, 18){
         this->v_x = v_x;
         this->v_y = v_y;
         this->a_x = a_x;
