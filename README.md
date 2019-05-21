@@ -3,6 +3,22 @@ Jetpack Misery
 
 Video game built for the graphics course at IIIT-H.
 
+# Screenshots
+![Screenshot 1](https://user-images.githubusercontent.com/30972152/58079027-60ccb600-7bb0-11e9-9cd6-cdd9aaa25ff6.png)
+![Screenshot 2](https://user-images.githubusercontent.com/30972152/58078994-514d6d00-7bb0-11e9-839a-b4aa6229f524.png)
+
+# Set Up
+## Compile
+
+`mkdir make && cd make`
+
+`cmake ..`
+
+`make`
+
+## Run
+`./graphics_asgn1`
+
 # Controls
 Movement:
 
